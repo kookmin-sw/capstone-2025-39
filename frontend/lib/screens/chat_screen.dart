@@ -16,13 +16,13 @@ class ChatScreenState extends State<ChatScreen> {
   final List<ChatMessage> messages = [];
   final TextEditingController _controller = TextEditingController();
   final ChatBotService _chatBotService = ChatBotService();
-
+  final String startDate = DateFormat(
+    'yyy. MM. dd EEEE',
+    'ko',
+  ).format(DateTime.now());
   void sendMessage(String text) {
     if (text.trim().isEmpty) return;
-
-    final now = DateTime.now();
-    final formattedTime =
-        '${now.day} ${DateFormat('MMM').format(now)} ${now.hour}:${now.minute.toString().padLeft(2, '0')}';
+    final formattedTime = DateFormat('aa hh:mm', 'ko').format(DateTime.now());
 
     setState(() {
       messages.add(ChatMessage(text: text, isUser: true, time: formattedTime));
@@ -77,9 +77,11 @@ class ChatScreenState extends State<ChatScreen> {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
           Text('새로운 채팅을 시작합니다'),
-          const SizedBox(height: 10),
+          const SizedBox(height: 18),
+          Text(startDate),
+          const SizedBox(height: 18),
           Expanded(
             child: ListView.builder(
               itemCount: messages.length,
