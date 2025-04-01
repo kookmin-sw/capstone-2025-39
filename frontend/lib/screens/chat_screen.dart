@@ -42,7 +42,37 @@ class ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('정릉친구 : 랏코'),
+        title: Row(
+          children: [
+            IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                // NavigationBar.pop(context); //뒤로가기 기능능
+              },
+            ),
+            CircleAvatar(
+              backgroundImage: AssetImage('assets/images/kiki.jpg'),
+              radius: 20,
+            ),
+            SizedBox(width: 8),
+            Text(
+              '강아지 키키',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              //메뉴 누르면 새로운 채팅, 설정 등 동작
+            },
+            icon: Icon(Icons.more_vert),
+          ),
+        ],
         backgroundColor: Color(0xCE90A891),
       ),
       body: Column(
