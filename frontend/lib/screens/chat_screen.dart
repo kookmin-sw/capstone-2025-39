@@ -30,8 +30,8 @@ class ChatScreenState extends State<ChatScreen> {
 
     _controller.clear();
 
-    Future.delayed(Duration(milliseconds: 500), () {
-      final botReply = _chatBotService.getReply(text);
+    Future.delayed(Duration(milliseconds: 500), () async {
+      final botReply = await _chatBotService.getReply(text);
       setState(() {
         messages.add(ChatMessage(text: botReply, isUser: false, time: ''));
       });
@@ -56,7 +56,7 @@ class ChatScreenState extends State<ChatScreen> {
             ),
             SizedBox(width: 8),
             Text(
-              '강아지 키키',
+              '챗봇',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
