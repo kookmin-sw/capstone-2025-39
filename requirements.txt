@@ -1,0 +1,7 @@
+langchain==0.1.12
+langchain-community==0.0.27
+sentence-transformers==2.5.1
+faiss-cpu==1.7.4
+pandas==2.2.1
+openpyxl==3.1.2
+unstructured==0.12.4 
