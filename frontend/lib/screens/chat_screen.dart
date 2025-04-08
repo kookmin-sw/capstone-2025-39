@@ -47,7 +47,7 @@ class ChatScreenState extends State<ChatScreen> {
             IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: () {
-                // NavigationBar.pop(context); //뒤로가기 기능능
+                // NavigationBar.pop(context); //뒤로가기 기능
               },
             ),
             CircleAvatar(
@@ -75,30 +75,42 @@ class ChatScreenState extends State<ChatScreen> {
         ],
         backgroundColor: Color(0xCE90A891),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          Text('새로운 채팅을 시작합니다'),
-          const SizedBox(height: 18),
-          Text(startDate),
-          const SizedBox(height: 18),
-          Expanded(
-            child: ListView.builder(
-              itemCount: messages.length,
-              padding: EdgeInsets.all(12),
-              itemBuilder: (context, index) {
-                final message = messages[index];
-                return ChatBubble(
-                  message: message.text,
-                  isUser: message.isUser,
-                  time: message.time,
-                );
-              },
+      body: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(12),
+                children: [
+                  Center(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 20),
+                        const Text('새로운 채팅을 시작합니다'),
+                        const SizedBox(height: 18),
+                        Text(startDate),
+                        const SizedBox(height: 18),
+                      ],
+                    ),
+                  ),
+
+                  // 채팅 메시지 목록
+                  ...messages.map(
+                    (message) => ChatBubble(
+                      message: message.text,
+                      isUser: message.isUser,
+                      time: message.time,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          ChatInputField(controller: _controller, onSend: sendMessage),
-        ],
-      ),
+            // 입력창
+            ChatInputField(controller: _controller, onSend: sendMessage),
+          ],
+        ), // Column
+      ), // Container
     );
   }
 }
