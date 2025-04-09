@@ -28,8 +28,18 @@ prompt = PromptTemplate(
     template=template,
 )
 
+# llm = HuggingFaceEndpoint(
+#     endpoint_url="deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+#     max_new_tokens=1024,
+#     top_k=3,
+#     top_p=0.80,
+#     typical_p=0.95,
+#     temperature=0.01,
+#     repetition_penalty=1.03,
+#     huggingfacehub_api_token="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"
+# )
 llm = HuggingFaceEndpoint(
-    endpoint_url="deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
+    endpoint_url="mistralai/Mistral-7B-Instruct-v0.2",
     max_new_tokens=1024,
     top_k=3,
     top_p=0.80,
