@@ -16,8 +16,13 @@ def load_documents():
     txt_loader = DirectoryLoader('dataset', glob="**/*.txt")
     documents.extend(txt_loader.load())
     
-    # Load CSV files
-    csv_loader = DirectoryLoader('dataset', glob="**/*.csv", loader_cls=CSVLoader)
+    # Load CSV files with UTF-8 encoding
+    csv_loader = DirectoryLoader(
+        'dataset', 
+        glob="**/*.csv", 
+        loader_cls=CSVLoader,
+        loader_kwargs={'encoding': 'utf-8'}
+    )
     documents.extend(csv_loader.load())
     
     # Load Excel files
