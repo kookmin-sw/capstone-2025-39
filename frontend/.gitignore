@@ -57,4 +57,3 @@ app.*.map.json
 
 # 환경 변수
 *.env
-apikeys.env
