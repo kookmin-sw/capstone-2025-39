@@ -50,7 +50,7 @@ class ChatBotService {
         'lng': 126.996379,
       };
 
-      return {'reply': "요청 실패했습니다: $e"};
+      // return {'reply': "요청 실패했습니다: $e"};
     }
   } //async
 }

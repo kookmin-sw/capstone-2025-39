@@ -33,6 +33,8 @@ migrate_working_dir/
 .pub/
 /build/
 
+*.apk
+
 # Symbolication related
 app.*.symbols
 
@@ -46,4 +48,3 @@ app.*.map.json
 
 # 환경 변수
 *.env
-apikeys.env
