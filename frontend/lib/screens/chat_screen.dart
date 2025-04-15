@@ -20,6 +20,7 @@ class ChatScreenState extends State<ChatScreen> {
     'yyy. MM. dd EEEE',
     'ko',
   ).format(DateTime.now());
+
   void sendMessage(String text) {
     if (text.trim().isEmpty) return;
     final formattedTime = DateFormat('aa hh:mm', 'ko').format(DateTime.now());
@@ -32,8 +33,19 @@ class ChatScreenState extends State<ChatScreen> {
 
     Future.delayed(Duration(milliseconds: 500), () async {
       final botReply = await _chatBotService.getReply(text);
+      final reply = botReply['reply'];
+      final safeReply =
+          (reply is String && reply.isNotEmpty) ? reply : '응답이 없습니다.';
       setState(() {
-        messages.add(ChatMessage(text: botReply, isUser: false, time: ''));
+        messages.add(
+          ChatMessage(
+            text: safeReply,
+            isUser: false,
+            time: '',
+            lat: botReply['lat'],
+            lng: botReply['lng'],
+          ),
+        );
       });
     });
   }
@@ -47,7 +59,7 @@ class ChatScreenState extends State<ChatScreen> {
             IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: () {
-                // NavigationBar.pop(context); //뒤로가기 기능
+                // NavigationBar.pop(context);
               },
             ),
             CircleAvatar(
@@ -94,23 +106,22 @@ class ChatScreenState extends State<ChatScreen> {
                       ],
                     ),
                   ),
-
-                  // 채팅 메시지 목록
                   ...messages.map(
                     (message) => ChatBubble(
                       message: message.text,
                       isUser: message.isUser,
                       time: message.time,
+                      lat: message.lat,
+                      lng: message.lng,
                     ),
                   ),
                 ],
               ),
             ),
-            // 입력창
             ChatInputField(controller: _controller, onSend: sendMessage),
           ],
-        ), // Column
-      ), // Container
+        ),
+      ),
     );
   }
 }

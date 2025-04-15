@@ -17,6 +17,7 @@ class ChatInputField extends StatefulWidget {
 
 class _ChatInputFieldState extends State<ChatInputField> {
   final FocusNode _focusNode = FocusNode();
+  bool _isPressed = false;
 
   @override
   void dispose() {
@@ -25,7 +26,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
     super.dispose(); //부모 클래스(State)의 dispose도 함께 실행한다.
   }
 
-  void _hanleSend() {
+  void _handleSend() {
     final text = widget.controller.text.trim();
     if (text.isEmpty) return;
 
@@ -80,7 +81,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
                     if (event is KeyDownEvent &&
                         event.logicalKey == LogicalKeyboardKey.enter &&
                         !isShiftPressed) {
-                      _hanleSend();
+                      _handleSend();
                     }
                   },
                   child: TextField(
@@ -103,11 +104,29 @@ class _ChatInputFieldState extends State<ChatInputField> {
                         padding: const EdgeInsets.only(left: 3.0, right: 3.6),
                         child: GestureDetector(
                           onTap: () => widget.onSend(widget.controller.text),
+                          onTapDown: (_) {
+                            setState(() {
+                              _isPressed = true;
+                            });
+                          },
+                          onTapCancel: () {
+                            setState(() {
+                              _isPressed = false;
+                            });
+                          },
+                          onTapUp: (_) {
+                            setState(() {
+                              _isPressed = false;
+                            });
+                          },
                           child: Container(
                             width: 36,
                             height: 36,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF5D815F),
+                            decoration: BoxDecoration(
+                              color:
+                                  _isPressed
+                                      ? Color(0xFF456947) //누른 상태 색
+                                      : Color(0xFF5D815F), //기본 색
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
