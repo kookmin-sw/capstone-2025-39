@@ -44,6 +44,8 @@ android/gradle.properties
 android/app/build/
 
 
+*.apk
+
 # Symbolication related
 app.*.symbols
 
