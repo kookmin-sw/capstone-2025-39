@@ -16,7 +16,7 @@ class ChatMap extends StatelessWidget {
     };
 
     return SizedBox(
-      height: 200,
+      height: 210,
       child: GoogleMap(
         initialCameraPosition: CameraPosition(target: myPosition, zoom: 15),
         markers: markers,
