@@ -57,7 +57,7 @@ class _ChatBubbleState extends State<ChatBubble> {
 
   @override
   Widget build(BuildContext context) {
-    final Color userBgColor = const Color(0xFF5D815F); // 사용자 말풍선 색
+    final Color userBgColor = const Color(0xFF5E8360); // 사용자 말풍선 색
     final Color userTextColor = Colors.white;
     final Color botBgColor = const Color(0xFFF5F5F5); // 챗봇 말풍선 색
     final Color botTextColor = Colors.black;
