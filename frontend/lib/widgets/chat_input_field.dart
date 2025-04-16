@@ -43,7 +43,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
       _isListening = false;
     });
 
-    //입력 후 포커스 해제 --> placeholder 다시 뜨도록
+    //입력 후 포커스 해제
     FocusScope.of(context).unfocus();
   }
 
@@ -55,7 +55,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
         }
       },
       onError: (error) {
-        print('Speech recognition error: $error');
+        print('Speech recognition error: $error'); //에러 출력
       },
     );
 
@@ -112,10 +112,9 @@ class _ChatInputFieldState extends State<ChatInputField> {
                     _isListening
                         ? SweepGradient(
                           colors: const [
-                            Color(0xFF5E8360),
                             Colors.green,
                             Colors.purple,
-                            Color(0xFF5E8360),
+                            Colors.green,
                           ],
                           startAngle: 0.0,
                           endAngle: 3.14 * 2,
