@@ -78,50 +78,48 @@ class _ChatBubbleState extends State<ChatBubble> {
             ),
 
           // 말풍선 디자인
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            constraints: const BoxConstraints(maxWidth: 280),
-            decoration: BoxDecoration(
-              color: widget.isUser ? userBgColor : botBgColor,
-              borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(16),
-                topRight: const Radius.circular(16),
-                bottomLeft:
-                    widget.isUser
-                        ? const Radius.circular(16)
-                        : const Radius.circular(0),
-                bottomRight:
-                    widget.isUser
-                        ? const Radius.circular(0)
-                        : const Radius.circular(16),
+          if (widget.message.trim().isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              constraints: const BoxConstraints(maxWidth: 280),
+              decoration: BoxDecoration(
+                color: widget.isUser ? userBgColor : botBgColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(16),
+                  topRight: const Radius.circular(16),
+                  bottomLeft:
+                      widget.isUser
+                          ? const Radius.circular(16)
+                          : const Radius.circular(0),
+                  bottomRight:
+                      widget.isUser
+                          ? const Radius.circular(0)
+                          : const Radius.circular(16),
+                ),
+              ),
+              child: Text(
+                widget.message,
+                style: TextStyle(
+                  color: widget.isUser ? userTextColor : botTextColor,
+                  fontSize: 16,
+                ),
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.message,
-                  style: TextStyle(
-                    color: widget.isUser ? userTextColor : botTextColor,
-                    fontSize: 16,
-                  ),
-                ),
-                if (!kIsWeb &&
-                    !widget.isUser &&
-                    widget.lat != null &&
-                    widget.lng != null)
-                  Container(
-                    height: 150,
-                    margin: const EdgeInsets.only(top: 8),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: ChatMap(lat: widget.lat!, lng: widget.lng!),
-                    ),
-                  ),
-              ],
+
+          //지도 부분
+          if (!kIsWeb &&
+              !widget.isUser &&
+              widget.lat != null &&
+              widget.lng != null)
+            Container(
+              height: 150,
+              margin: const EdgeInsets.only(bottom: 8, left: 12, right: 12),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: ChatMap(lat: widget.lat!, lng: widget.lng!),
+              ),
             ),
-          ),
 
           // 로딩 중 애니메이션
           if (widget.isGenerating && !widget.isUser)
