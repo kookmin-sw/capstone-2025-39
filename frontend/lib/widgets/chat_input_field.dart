@@ -23,6 +23,8 @@ class _ChatInputFieldState extends State<ChatInputField> {
   final SpeechToText _speech = SpeechToText();
   bool _isListening = false;
 
+  String _latestRecognizedWords = '';
+
   @override
   void dispose() {
     _focusNode.dispose(); //FocusNode를 메모리에서 제거
@@ -35,19 +37,25 @@ class _ChatInputFieldState extends State<ChatInputField> {
     if (text.isEmpty) return;
 
     widget.onSend(text);
-    widget.controller.clear();
 
     //전송 후 STT 멈추기
     _speech.stop();
     setState(() {
       _isListening = false;
+      _latestRecognizedWords = ''; // 전송 후 이전 텍스트 제거
     });
+
+    widget.controller.clear();
 
     //입력 후 포커스 해제
     FocusScope.of(context).unfocus();
   }
 
   Future<void> _startListening() async {
+    // stt 초기화
+    await _speech.cancel();
+    widget.controller.clear();
+    _latestRecognizedWords = '';
     bool available = await _speech.initialize(
       onStatus: (status) {
         if (status == 'notListening') {
@@ -63,8 +71,10 @@ class _ChatInputFieldState extends State<ChatInputField> {
       setState(() => _isListening = true);
       _speech.listen(
         onResult: (result) {
+          if (!_isListening) return;
           setState(() {
-            widget.controller.text = result.recognizedWords;
+            _latestRecognizedWords = result.recognizedWords;
+            widget.controller.text = _latestRecognizedWords;
             widget.controller.selection = TextSelection.fromPosition(
               TextPosition(offset: widget.controller.text.length),
             );
@@ -174,6 +184,12 @@ class _ChatInputFieldState extends State<ChatInputField> {
                       fontSize: 14,
                       height: 1, // 줄 간격
                     ),
+                    onTap: () {
+                      if (_isListening) {
+                        _speech.stop(); //stt 꺼짐
+                        setState(() => _isListening = false);
+                      }
+                    },
                     decoration: InputDecoration(
                       hintText: 'Message...',
                       border: InputBorder.none,
@@ -185,7 +201,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
                       suffixIcon: Padding(
                         padding: const EdgeInsets.only(left: 3.0, right: 3.6),
                         child: GestureDetector(
-                          onTap: () => widget.onSend(widget.controller.text),
+                          onTap: () => _handleSend(),
                           onTapDown: (_) {
                             setState(() {
                               _isPressed = true;
