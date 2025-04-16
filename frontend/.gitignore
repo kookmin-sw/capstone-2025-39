@@ -32,6 +32,9 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+**/build/
+
+*.apk
 
 # 키 정보 - 업로드 금지
 android/gradle.properties

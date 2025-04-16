@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/widgets/bottom_nav.dart';
 import 'package:frontend/screens/chat_screen.dart';
+import 'package:frontend/screens/login_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -12,8 +13,18 @@ class HomeScreen extends StatelessWidget {
       bottomNavigationBar: BottomNavBar(
         currentIndex: 0,
         onTap: (index) {
-          // 페이지 이동 로직 작성 하기!!
-          print("탭 $index 클릭됨");
+          // 페이지 이동 로직
+          if (index == 0) {
+            // 홈 화면, 이동X
+          } else if (index == 1) {
+            // TODO : 채팅 기록 구현!!
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => LoginScreen()),
+            );
+          }
+
         },
       ),
       body: SafeArea(

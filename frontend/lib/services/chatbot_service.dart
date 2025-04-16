@@ -10,6 +10,7 @@ class ChatBotService {
 
      임시로 서버 로컬에서 돌리므로 http://10.0.2.2:8080/chat 형태
   */
+
   final String springBootUrl = 'http://211.188.53.1:8080/api/chat';
 
   Future<Map<String, dynamic>> getReply(String input) async {
