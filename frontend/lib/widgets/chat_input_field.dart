@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // LogicalKeyboardKey & KeyEvent 관련
+import 'package:speech_to_text/speech_to_text.dart';
 
 class ChatInputField extends StatefulWidget {
   final TextEditingController controller;
@@ -17,23 +18,68 @@ class ChatInputField extends StatefulWidget {
 
 class _ChatInputFieldState extends State<ChatInputField> {
   final FocusNode _focusNode = FocusNode();
+  bool _isPressed = false;
+
+  final SpeechToText _speech = SpeechToText();
+  bool _isListening = false;
 
   @override
   void dispose() {
-    //FocusNode를 메모리에서 제거
-    _focusNode.dispose(); //FocusNode를 메모리에서 해제
-    super.dispose(); //부모 클래스(State)의 dispose도 함께 실행한다.
+    _focusNode.dispose(); //FocusNode를 메모리에서 제거
+    _speech.stop(); // 말 그만 듣게
+    super.dispose(); // 부모 클래스(State)의 dispose도 함께 실행
   }
 
-  void _hanleSend() {
+  void _handleSend() {
     final text = widget.controller.text.trim();
     if (text.isEmpty) return;
 
     widget.onSend(text);
     widget.controller.clear();
 
-    //입력 후 포커스 해제 --> placeholder 다시 뜨도록
+    //전송 후 STT 멈추기
+    _speech.stop();
+    setState(() {
+      _isListening = false;
+    });
+
+    //입력 후 포커스 해제
     FocusScope.of(context).unfocus();
+  }
+
+  Future<void> _startListening() async {
+    bool available = await _speech.initialize(
+      onStatus: (status) {
+        if (status == 'notListening') {
+          setState(() => _isListening = false);
+        }
+      },
+      onError: (error) {
+        print('Speech recognition error: $error'); //에러 출력
+      },
+    );
+
+    if (available) {
+      setState(() => _isListening = true);
+      _speech.listen(
+        onResult: (result) {
+          setState(() {
+            widget.controller.text = result.recognizedWords;
+            widget.controller.selection = TextSelection.fromPosition(
+              TextPosition(offset: widget.controller.text.length),
+            );
+          });
+        },
+        localeId: 'ko_KR', // 한국어
+      );
+    } else {
+      setState(() => _isListening = false);
+    }
+  }
+
+  void _stopListening() async {
+    await _speech.stop();
+    setState(() => _isListening = false);
   }
 
   @override
@@ -44,15 +90,52 @@ class _ChatInputFieldState extends State<ChatInputField> {
       child: Row(
         children: [
           // 음성녹음 버튼(마이크)
-          Container(
-            width: 36,
-            height: 36,
-            margin: const EdgeInsets.only(right: 10),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.black26),
+          GestureDetector(
+            onTapDown: (_) {
+              _startListening();
+            },
+            onTapUp: (_) {
+              _stopListening();
+            },
+            onTapCancel: () {
+              _stopListening(); // 손가락을 바깥으로 떼도 중지
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: 36,
+              height: 36,
+              margin: const EdgeInsets.only(right: 10),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(width: 3, color: Colors.transparent),
+                gradient:
+                    _isListening
+                        ? SweepGradient(
+                          colors: const [
+                            Colors.green,
+                            Colors.purple,
+                            Colors.green,
+                          ],
+                          startAngle: 0.0,
+                          endAngle: 3.14 * 2,
+                          tileMode: TileMode.repeated,
+                        )
+                        : null,
+                color: Colors.white,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                  border: Border.all(color: Colors.black26, width: 1),
+                ),
+                child: Icon(
+                  Icons.mic,
+                  size: 22,
+                  color: _isListening ? Color(0xFF5E8360) : Colors.black87,
+                ),
+              ),
             ),
-            child: Icon(Icons.mic, size: 20),
           ),
 
           // text input box (TextField + 전송 버튼)
@@ -80,7 +163,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
                     if (event is KeyDownEvent &&
                         event.logicalKey == LogicalKeyboardKey.enter &&
                         !isShiftPressed) {
-                      _hanleSend();
+                      _handleSend();
                     }
                   },
                   child: TextField(
@@ -103,17 +186,35 @@ class _ChatInputFieldState extends State<ChatInputField> {
                         padding: const EdgeInsets.only(left: 3.0, right: 3.6),
                         child: GestureDetector(
                           onTap: () => widget.onSend(widget.controller.text),
+                          onTapDown: (_) {
+                            setState(() {
+                              _isPressed = true;
+                            });
+                          },
+                          onTapCancel: () {
+                            setState(() {
+                              _isPressed = false;
+                            });
+                          },
+                          onTapUp: (_) {
+                            setState(() {
+                              _isPressed = false;
+                            });
+                          },
                           child: Container(
                             width: 36,
                             height: 36,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF5D815F),
+                            decoration: BoxDecoration(
+                              color:
+                                  _isPressed
+                                      ? Color(0xFF456947) //누른 상태 색
+                                      : Color(0xFF5D815F), //기본 색
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
                               Icons.arrow_upward,
                               color: Colors.white,
-                              size: 20,
+                              size: 22,
                             ),
                           ),
                         ),

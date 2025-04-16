@@ -33,6 +33,11 @@ migrate_working_dir/
 .pub/
 /build/
 
+# 키 정보 - 업로드 금지
+android/gradle.properties
+android/app/build/
+
+
 # Symbolication related
 app.*.symbols
 
