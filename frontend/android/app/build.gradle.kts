@@ -1,5 +1,3 @@
-import java.util.Properties
-
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -7,24 +5,9 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-repositories {
-    google()
-    maven {
-        url = uri("https://maven.google.com")
-    }
-}
-
-val localProps = Properties()
-val localPropsFile = rootProject.file("local.properties")
-if (localPropsFile.exists()) {
-    localProps.load(localPropsFile.inputStream())
-}
-
-
 android {
     namespace = "com.example.frontend"
-    compileSdk = 35
-    buildToolsVersion = "34.0.0"
+    compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -41,31 +24,32 @@ android {
         applicationId = "com.example.frontend"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
-        
-        // Load Google Maps API key from local.properties
-        val googleMapsApiKey = localProps.getProperty("GOOGLE_MAPS_API_KEY") ?: ""
-        resValue("string", "google_maps_key", googleMapsApiKey)
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+
+	    val apiKey = (project.findProperty("GOOGLE_MAPS_API_KEY") ?: error("Missing GOOGLE_MAPS_API_KEY")) as String
+        resValue("string", "google_map_api_key", apiKey)
     }
 
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
+            
+            //build 오류 해결 부분분
             signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+            isShrinkResources = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
 
-
-
-dependencies {
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
-}
-
 flutter {
-    source = "."
+    source = "../.."
 }
