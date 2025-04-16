@@ -38,15 +38,21 @@ class ChatScreenState extends State<ChatScreen> {
       final safeReply =
           (reply is String && reply.isNotEmpty) ? reply : '응답이 없습니다.';
       setState(() {
-        messages.add(
-          ChatMessage(
-            text: safeReply,
-            isUser: false,
-            time: '',
-            lat: botReply['lat'],
-            lng: botReply['lng'],
-          ),
-        );
+        // 텍스트 응답 추가
+        messages.add(ChatMessage(text: safeReply, isUser: false, time: ''));
+
+        //지도 응답이 있으면 별도 말풍선
+        if (botReply['lat'] != null && botReply['lng'] != null) {
+          messages.add(
+            ChatMessage(
+              text: '', // 텍스트 없이 지도만
+              isUser: false,
+              time: '',
+              lat: botReply['lat'],
+              lng: botReply['lng'],
+            ),
+          );
+        }
       });
     });
   }
