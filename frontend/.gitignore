@@ -21,7 +21,7 @@ migrate_working_dir/
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
-.vscode/
+#.vscode/
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -44,8 +44,10 @@ android/gradle.properties
 android/app/build/
 
 
-# 실행파일들
-**/*.apk
+# 키 정보 - 업로드 금지
+android/gradle.properties
+android/app/build/
+
 
 # Symbolication related
 app.*.symbols
@@ -57,6 +59,3 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-
-# 환경 변수
-*.env
