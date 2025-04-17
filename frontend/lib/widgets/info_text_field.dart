@@ -13,10 +13,6 @@ class InfoTextField extends StatelessWidget {
   });
 
   // 로그인 , 정보 입력 부분
-<<<<<<< HEAD
-  // 로그인 , 정보 입력 부분
-=======
->>>>>>> 1213d29 (로그인 ui수정)
   @override
   Widget build(BuildContext context) {
     return TextField(
@@ -26,12 +22,6 @@ class InfoTextField extends StatelessWidget {
         fontWeight: FontWeight.w400,
         color: Colors.black87,
       ),
-<<<<<<< HEAD
-      style: const TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        color: Colors.black87,
-      ),
       decoration: InputDecoration(
         hintText: hintText,
         hintStyle: TextStyle(
@@ -52,29 +42,6 @@ class InfoTextField extends StatelessWidget {
           horizontal: 20,
           vertical: 18,
         ),
-=======
-      decoration: InputDecoration(
-        hintText: hintText,
-        hintStyle: TextStyle(
-          color: Colors.grey.shade400,
-          fontWeight: FontWeight.w500,
-        ),
-        filled: true,
-        fillColor: const Color(0xFFF9FAFB), // 밝은 회색 배경
-        suffixIcon: Container(
-          margin: const EdgeInsets.only(right: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF7F8FA), // 초록색 버튼
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: Color(0xFF5E8360), size: 22),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
-        fillColor: Colors.grey.shade100,
->>>>>>> 1213d29 (로그인 ui수정)
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
