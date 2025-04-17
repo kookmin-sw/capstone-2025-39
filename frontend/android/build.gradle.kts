@@ -1,16 +1,3 @@
-import java.util.Properties
-
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath("com.android.tools.build:gradle:8.1.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0")
-    }
-}
-
 allprojects {
     repositories {
         google()
@@ -22,6 +9,9 @@ allprojects {
 // rootProject.layout.buildDirectory.value(newBuildDir)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e9fc20e (프로젝트 구조 수정)
 // subprojects {
 //     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
 //     project.layout.buildDirectory.value(newSubprojectBuildDir)
@@ -29,6 +19,7 @@ allprojects {
 // subprojects {
 //     project.evaluationDependsOn(":app")
 // }
+<<<<<<< HEAD
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
@@ -38,10 +29,13 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
+=======
+>>>>>>> e9fc20e (프로젝트 구조 수정)
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
+<<<<<<< HEAD
 
 fun loadEnvProperty(key: String): String {
     val envFile = rootProject.file(".env")
@@ -53,3 +47,5 @@ fun loadEnvProperty(key: String): String {
 
 extra["GOOGLE_MAPS_API_KEY"] = loadEnvProperty("GOOGLE_MAPS_API_KEY")
 >>>>>>> 55ebd0d (지도 기능 구현)
+=======
+>>>>>>> e9fc20e (프로젝트 구조 수정)
