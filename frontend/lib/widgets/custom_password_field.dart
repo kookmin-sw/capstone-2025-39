@@ -12,29 +12,17 @@ class CustomPasswordField extends StatefulWidget {
 class _CustomPasswordFieldState extends State<CustomPasswordField> {
   bool obscureText = true;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
   // password 입력 부분
-=======
->>>>>>> 1213d29 (로그인 ui수정)
-=======
-  // password 입력 부분
->>>>>>> ff5823f (google sign-in)
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: widget.controller,
       obscureText: obscureText,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> ff5823f (google sign-in)
       style: const TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w400,
         color: Colors.black87,
       ),
-<<<<<<< HEAD
       decoration: InputDecoration(
         hintText: 'Password',
         hintStyle: TextStyle(
@@ -47,34 +35,10 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
           horizontal: 20,
           vertical: 18,
         ),
-=======
-=======
->>>>>>> ff5823f (google sign-in)
-      decoration: InputDecoration(
-        hintText: 'Password',
-        hintStyle: TextStyle(
-          color: Colors.grey.shade400,
-          fontWeight: FontWeight.w500,
-        ),
-        filled: true,
-<<<<<<< HEAD
-        fillColor: Colors.grey.shade100,
->>>>>>> 1213d29 (로그인 ui수정)
-=======
-        fillColor: const Color(0xFFF7F8FA),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 18,
-        ),
->>>>>>> ff5823f (google sign-in)
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
         ),
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> ff5823f (google sign-in)
 
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 12),
@@ -103,11 +67,6 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
           minWidth: 28,
           minHeight: 28,
         ),
-<<<<<<< HEAD
-=======
->>>>>>> 1213d29 (로그인 ui수정)
-=======
->>>>>>> ff5823f (google sign-in)
       ),
     );
   }
