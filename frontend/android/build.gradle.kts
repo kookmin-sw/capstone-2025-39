@@ -23,6 +23,7 @@ allprojects {
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
+<<<<<<< HEAD
 }
 =======
 subprojects {
@@ -49,3 +50,6 @@ extra["GOOGLE_MAPS_API_KEY"] = loadEnvProperty("GOOGLE_MAPS_API_KEY")
 >>>>>>> 55ebd0d (지도 기능 구현)
 =======
 >>>>>>> e9fc20e (프로젝트 구조 수정)
+=======
+}
+>>>>>>> 1213d29 (로그인 ui수정)

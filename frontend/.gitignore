@@ -34,6 +34,7 @@ migrate_working_dir/
 /build/
 **/build/
 
+<<<<<<< HEAD
 # 대용량 빌드 파일 무시시
 *.hprof0
 *.apk
@@ -43,6 +44,9 @@ kernel_blob.bin
 android/gradle.properties
 android/app/build/
 
+=======
+*.apk
+>>>>>>> 1213d29 (로그인 ui수정)
 
 # 키 정보 - 업로드 금지
 android/gradle.properties
