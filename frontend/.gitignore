@@ -35,7 +35,7 @@ migrate_working_dir/
 **/build/
 
 # 대용량 빌드 파일 무시시
-*.hprof
+*.hprof0
 *.apk
 kernel_blob.bin
 
