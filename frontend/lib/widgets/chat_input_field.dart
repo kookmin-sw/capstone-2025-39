@@ -16,6 +16,7 @@ class ChatInputField extends StatefulWidget {
   State<ChatInputField> createState() => _ChatInputFieldState();
 }
 
+// 채팅 내의 Input 부분
 class _ChatInputFieldState extends State<ChatInputField> {
   final FocusNode _focusNode = FocusNode();
   bool _isPressed = false;
@@ -141,7 +142,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
                 ),
                 child: Icon(
                   Icons.mic,
-                  size: 22,
+                  size: 25,
                   color: _isListening ? Color(0xFF5E8360) : Colors.black87,
                 ),
               ),
@@ -230,7 +231,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
                             child: const Icon(
                               Icons.arrow_upward,
                               color: Colors.white,
-                              size: 22,
+                              size: 24,
                             ),
                           ),
                         ),

@@ -12,15 +12,36 @@ class InfoTextField extends StatelessWidget {
     required this.controller,
   });
 
+  // 로그인 , 정보 입력 부분
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
+      style: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        color: Colors.black87,
+      ),
       decoration: InputDecoration(
         hintText: hintText,
-        suffixIcon: Icon(icon),
+        hintStyle: TextStyle(
+          color: Colors.grey.shade400,
+          fontWeight: FontWeight.w500,
+        ),
         filled: true,
-        fillColor: Colors.grey.shade100,
+        fillColor: const Color(0xFFF9FAFB), // 밝은 회색 배경
+        suffixIcon: Container(
+          margin: const EdgeInsets.only(right: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF7F8FA), // 초록색 버튼
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: Color(0xFF5E8360), size: 22),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 18,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
