@@ -12,11 +12,15 @@ class InfoTextField extends StatelessWidget {
     required this.controller,
   });
 
+<<<<<<< HEAD
   // 로그인 , 정보 입력 부분
+=======
+>>>>>>> 1213d29 (로그인 ui수정)
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
+<<<<<<< HEAD
       style: const TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w400,
@@ -42,6 +46,13 @@ class InfoTextField extends StatelessWidget {
           horizontal: 20,
           vertical: 18,
         ),
+=======
+      decoration: InputDecoration(
+        hintText: hintText,
+        suffixIcon: Icon(icon),
+        filled: true,
+        fillColor: Colors.grey.shade100,
+>>>>>>> 1213d29 (로그인 ui수정)
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,

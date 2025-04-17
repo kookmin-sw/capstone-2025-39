@@ -12,12 +12,16 @@ class CustomPasswordField extends StatefulWidget {
 class _CustomPasswordFieldState extends State<CustomPasswordField> {
   bool obscureText = true;
 
+<<<<<<< HEAD
   // password 입력 부분
+=======
+>>>>>>> 1213d29 (로그인 ui수정)
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: widget.controller,
       obscureText: obscureText,
+<<<<<<< HEAD
       style: const TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w400,
@@ -35,10 +39,25 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
           horizontal: 20,
           vertical: 18,
         ),
+=======
+      decoration: InputDecoration(
+        hintText: 'Password',
+        suffixIcon: IconButton(
+          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
+          onPressed: () {
+            setState(() {
+              obscureText = !obscureText;
+            });
+          },
+        ),
+        filled: true,
+        fillColor: Colors.grey.shade100,
+>>>>>>> 1213d29 (로그인 ui수정)
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
         ),
+<<<<<<< HEAD
 
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 12),
@@ -67,6 +86,8 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
           minWidth: 28,
           minHeight: 28,
         ),
+=======
+>>>>>>> 1213d29 (로그인 ui수정)
       ),
     );
   }

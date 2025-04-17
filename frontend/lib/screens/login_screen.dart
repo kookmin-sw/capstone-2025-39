@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:frontend/screens/extra_info_screen.dart';
+=======
+>>>>>>> 1213d29 (로그인 ui수정)
 import '../widgets/info_text_field.dart';
 import '../widgets/custom_password_field.dart';
 import '../widgets/custom_button.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+<<<<<<< HEAD
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -75,6 +79,13 @@ class _LoginScreenState extends State<LoginScreen> {
       ).showSnackBar(const SnackBar(content: Text('Google 로그인 중 오류가 발생했습니다.')));
     }
   }
+=======
+class LoginScreen extends StatelessWidget {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  LoginScreen({super.key});
+>>>>>>> 1213d29 (로그인 ui수정)
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +104,11 @@ class _LoginScreenState extends State<LoginScreen> {
               child: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.black),
                 onPressed: () {
+<<<<<<< HEAD
                   Navigator.of(context).pop();
+=======
+                  Navigator.of(context).pop(); // ← 여기서 뒤로가기
+>>>>>>> 1213d29 (로그인 ui수정)
                 },
               ),
             ),
@@ -111,7 +126,11 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 8),
               InfoTextField(
                 hintText: 'Email',
+<<<<<<< HEAD
                 icon: Icons.email,
+=======
+                icon: Icons.email_outlined,
+>>>>>>> 1213d29 (로그인 ui수정)
                 controller: emailController,
               ),
               const SizedBox(height: 24),
@@ -158,6 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+<<<<<<< HEAD
                 children: [
                   // 구글 로그인 동작
                   SizedBox(
@@ -209,6 +229,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
+=======
+                children: const [
+                  CircleAvatar(child: Icon(Icons.g_mobiledata, size: 32)),
+                  CircleAvatar(child: Icon(Icons.apple, size: 28)),
+>>>>>>> 1213d29 (로그인 ui수정)
                 ],
               ),
               const SizedBox(height: 24),
@@ -233,11 +258,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         }),
                       );
 
+<<<<<<< HEAD
                       if (!mounted) return;
 
                       if (response.statusCode == 200) {
                         final responseData = jsonDecode(response.body);
                         print('로그인 성공: ${responseData['message']}');
+=======
+                      if (response.statusCode == 200) {
+                        final responseData = jsonDecode(response.body);
+                        print('로그인 성공: ${responseData['message']}');
+
+                        // 예: Navigator.pushReplacement(...) 로 메인 화면으로 이동
+                        // 또는 토큰 저장, 상태 관리 등
+>>>>>>> 1213d29 (로그인 ui수정)
                       } else {
                         print('로그인 실패: ${response.body}');
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -247,7 +281,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
                       }
                     } catch (e) {
+<<<<<<< HEAD
                       if (!mounted) return;
+=======
+>>>>>>> 1213d29 (로그인 ui수정)
                       print('오류 발생: $e');
                       ScaffoldMessenger.of(
                         context,

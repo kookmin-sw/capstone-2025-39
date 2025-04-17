@@ -13,16 +13,28 @@ class HomeScreen extends StatelessWidget {
       bottomNavigationBar: BottomNavBar(
         currentIndex: 0,
         onTap: (index) {
+<<<<<<< HEAD
           if (index == 0) {
             // 홈
           } else if (index == 1) {
             // TODO: 채팅 기록 화면
+=======
+          // 페이지 이동 로직
+          if (index == 0) {
+            // 홈 화면, 이동X
+          } else if (index == 1) {
+            // TODO : 채팅 기록 구현!!
+>>>>>>> 1213d29 (로그인 ui수정)
           } else if (index == 2) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => LoginScreen()),
             );
           }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 1213d29 (로그인 ui수정)
         },
       ),
       body: SafeArea(
