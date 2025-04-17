@@ -9,82 +9,74 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF5B7553), // 초록 배경
       bottomNavigationBar: BottomNavBar(
         currentIndex: 0,
         onTap: (index) {
-          // 페이지 이동 로직
           if (index == 0) {
-            // 홈 화면, 이동X
+            // 홈
           } else if (index == 1) {
-            // TODO : 채팅 기록 구현!!
+            // TODO: 채팅 기록 화면
           } else if (index == 2) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => LoginScreen()),
             );
           }
-
         },
       ),
       body: SafeArea(
         child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // 대화 시작하기 버튼
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ChatScreen(),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5B7553), // 초록 계열
-                    minimumSize: const Size(350, 80),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    '대화 시작하기',
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // 말풍선 아이콘
+              Image.asset(
+                'assets/images/home_icon.png',
+                width: 150,
+                height: 150,
+              ),
+              const SizedBox(height: 24),
+
+              // 설명 텍스트
+              const Text(
+                'Start chatting now.\nYou can ask me anything.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              // 대화 시작 버튼
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ChatScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  minimumSize: const Size(250, 60),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                const SizedBox(height: 40),
-
-                // 앱 설명 버튼
-                _buildSubButton('정릉 동네 정보, 한눈에 보기'),
-                const SizedBox(height: 16),
-                _buildSubButton('마을 소식 알아보기'),
-                const SizedBox(height: 16),
-                _buildSubButton('음성인식으로 쉽게 대화해요'),
-              ],
-            ),
+                child: const Text(
+                  '대화 시작하기',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF5B7553),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-      ),
-    );
-  }
-
-  // 서브 버튼 위젯 분류
-  Widget _buildSubButton(String text) {
-    return Container(
-      width: double.infinity,
-      height: 50,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF9F9F9),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        text,
-        style: const TextStyle(color: Colors.grey, fontSize: 14),
       ),
     );
   }
