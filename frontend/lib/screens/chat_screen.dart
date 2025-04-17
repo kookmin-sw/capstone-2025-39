@@ -38,21 +38,15 @@ class ChatScreenState extends State<ChatScreen> {
       final safeReply =
           (reply is String && reply.isNotEmpty) ? reply : '응답이 없습니다.';
       setState(() {
-        // 텍스트 응답 추가
-        messages.add(ChatMessage(text: safeReply, isUser: false, time: ''));
-
-        //지도 응답이 있으면 별도 말풍선
-        if (botReply['lat'] != null && botReply['lng'] != null) {
-          messages.add(
-            ChatMessage(
-              text: '', // 텍스트 없이 지도만
-              isUser: false,
-              time: '',
-              lat: botReply['lat'],
-              lng: botReply['lng'],
-            ),
-          );
-        }
+        messages.add(
+          ChatMessage(
+            text: safeReply,
+            isUser: false,
+            time: '',
+            lat: botReply['lat'],
+            lng: botReply['lng'],
+          ),
+        );
       });
     });
   }
@@ -68,8 +62,19 @@ class ChatScreenState extends State<ChatScreen> {
         title: Stack(
           alignment: Alignment.center,
           children: [
-            const Text(
-              '정릉친구',
+            IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                // NavigationBar.pop(context);
+              },
+            ),
+            CircleAvatar(
+              backgroundImage: AssetImage('assets/images/kiki.jpg'),
+              radius: 20,
+            ),
+            SizedBox(width: 8),
+            Text(
+              '챗봇',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -88,50 +93,39 @@ class ChatScreenState extends State<ChatScreen> {
           ],
         ),
       ),
-      body: SafeArea(
-        child: Container(
-          color: Colors.white,
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 16,
+      body: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(12),
+                children: [
+                  Center(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 20),
+                        const Text('새로운 채팅을 시작합니다'),
+                        const SizedBox(height: 18),
+                        Text(startDate),
+                        const SizedBox(height: 18),
+                      ],
+                    ),
                   ),
-                  itemCount: messages.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return Column(
-                        children: [
-                          const Text(
-                            '새로운 채팅을 시작합니다',
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            startDate,
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-                      );
-                    }
-
-                    final message = messages[index - 1];
-                    return ChatBubble(
+                  ...messages.map(
+                    (message) => ChatBubble(
                       message: message.text,
                       isUser: message.isUser,
                       time: message.time,
                       lat: message.lat,
                       lng: message.lng,
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                ],
               ),
-              ChatInputField(controller: _controller, onSend: sendMessage),
-            ],
-          ),
+            ),
+            ChatInputField(controller: _controller, onSend: sendMessage),
+          ],
         ),
       ),
     );
