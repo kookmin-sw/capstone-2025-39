@@ -1,24 +1,36 @@
 from flask import Flask, request, jsonify
 
-from langchain.llms import HuggingFaceHub
 from langchain.chains import RetrievalQA
 from langchain.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEndpoint
-from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.prompts import PromptTemplate
+from dotenv import load_dotenv
+from langchain_openai import OpenAI
+from langchain_openai import OpenAIEmbeddings
 
-embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
-vectorstore = FAISS.load_local('./vectorDB/0409FAISS', embedding_model, allow_dangerous_deserialization=True)
+load_dotenv()
+
+embed_model = OpenAIEmbeddings(
+        model="text-embedding-3-small"
+    )
+vectorstore = FAISS.load_local(
+    './vectorDB/20250424FAISS',
+    embed_model,
+    allow_dangerous_deserialization=True
+    )
 
 template = """당신은 정릉동의 맛집들에 대해 박식한 도우미 입니다. 주어진 context를 참고하여 질문에 응답하세요. 그리고 다음사항을 준수하세요.
-1. 한국어로 대답하세요.
-2. 동네친구를 대하듯이 반말로 친근하게 답변하세요.
+0. context에 리뷰정보가 포함되어있는 경우, 이는 실제 주민들의 방문 후기이므로 개인정보를 위해 참고만 할 뿐, 해당 내용을 수정없이 답변으로 내보내면 안됩니다.
+1. 리뷰정보를 참고하였더라도, 당신이 직접 경험해본 것 처럼 말하지 마십시오. 당신은 어디까지나 해당 정보를 참고한 AI 도우미 일 뿐입니다.
+2. 한국어로 대답하세요.
+3. 반말로 친근하게 답변하세요.
+4. 음식점의 음식들을 추천할때, 가격 정보가 있다면 이 정보도 알려주는 것을 권장합니다.
 
 
-컨텍스트:
+
+context:
 {context}
 
-질문:
+question:
 {question}
 
 답변:"""
@@ -28,39 +40,23 @@ prompt = PromptTemplate(
     template=template,
 )
 
-# llm = HuggingFaceEndpoint(
-#     endpoint_url="deepseek-ai/DeepSeek-R1-Distill-Qwen-14B",
-#     max_new_tokens=1024,
-#     top_k=3,
-#     top_p=0.80,
-#     typical_p=0.95,
-#     temperature=0.01,
-#     repetition_penalty=1.03,
-#     huggingfacehub_api_token="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"
-# )
-llm = HuggingFaceEndpoint(
-    endpoint_url="mistralai/Mistral-7B-Instruct-v0.2",
-    max_new_tokens=1024,
-    top_k=3,
-    top_p=0.80,
-    typical_p=0.95,
-    temperature=0.01,
-    repetition_penalty=1.03,
-    huggingfacehub_api_token="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"
+llm = OpenAI(
+    model="gpt-4.1-nano-2025-04-14",
+    max_tokens=1024,
+    temperature=0.7,
+    max_retries=2,
 )
 
-
-# RetrievalQA 체인 생성 시, chain_type_kwargs에 프롬프트를 추가합니다.
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     chain_type="stuff",  # 모든 문서를 하나로 합쳐서 사용
     retriever=vectorstore.as_retriever(),  # 앞서 생성한 FAISS 벡터스토어 사용
-    chain_type_kwargs={"prompt": prompt}  # 사용자 정의 프롬프트 템플릿 적용
+    chain_type_kwargs={"prompt": prompt},  # 사용자 정의 프롬프트 템플릿 적용
+    return_source_documents=True # 검색된 문서를 함께 반환하도록 설정
 )
 
+
 app = Flask(__name__)
-
-
 
 @app.route('/chat', methods=['POST'])
 def handle_chat():
@@ -69,13 +65,12 @@ def handle_chat():
     user_input = data.get('message', '')
     result = qa_chain.invoke(user_input)
 
-    print(f"받은 메시지: {user_input}")
+    print(f"받은 메시지: {user_input}\n")
+    print(f"반환 결과: {result}")
 
-    # 임시 응답 생성 (실제로는 전처리, RAG, LLM 호출 등이 들어감)
     response_text = f"AI 응답: '{result['result']}' "
 
     return jsonify({'response': response_text})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-    

@@ -1,0 +1,4 @@
+.env
+
+# Ignore directories directly under vectorDB, but not files
+vectorDB/*

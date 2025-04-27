@@ -2,20 +2,15 @@ import os
 from datetime import datetime
 from langchain_community.document_loaders import (
     DirectoryLoader,
-    CSVLoader,
-    UnstructuredExcelLoader
+    CSVLoader
 )
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
+from dotenv import load_dotenv
+from langchain_openai import OpenAIEmbeddings
 
-def load_documents():
+def load_documents_from_dir():
     documents = []
-    
-    # Load text files
-    txt_loader = DirectoryLoader('dataset', glob="**/*.txt")
-    documents.extend(txt_loader.load())
-    
     # Load CSV files with UTF-8 encoding
     csv_loader = DirectoryLoader(
         'dataset', 
@@ -25,15 +20,11 @@ def load_documents():
     )
     documents.extend(csv_loader.load())
     
-    # Load Excel files
-    excel_loader = DirectoryLoader('dataset', glob="**/*.xlsx", loader_cls=UnstructuredExcelLoader)
-    documents.extend(excel_loader.load())
-    
     return documents
 
 def create_vector_db():
     # Load documents from the dataset directory
-    documents = load_documents()
+    documents = load_documents_from_dir()
     
     # Split documents into chunks
     text_splitter = RecursiveCharacterTextSplitter(
@@ -44,20 +35,20 @@ def create_vector_db():
     splits = text_splitter.split_documents(documents)
     
     # Initialize embeddings
-    embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    embed_model = OpenAIEmbeddings(
+        model="text-embedding-3-small"
     )
-    
     # Create FAISS vector store
-    vectorstore = FAISS.from_documents(splits, embeddings)
+    vectorstore = FAISS.from_documents(splits, embed_model)
     
     # Create timestamp for the save directory
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    save_dir = f"vectorDB/faiss_index_{timestamp}"
+    timestamp = datetime.now().strftime("%Y%m%d")
+    save_dir = f"vectorDB/{timestamp}FAISS"
     
     # Save the vector store
     vectorstore.save_local(save_dir)
     print(f"Vector database saved to: {save_dir}")
 
 if __name__ == "__main__":
+    load_dotenv() # Load environment variables from .env file
     create_vector_db()
