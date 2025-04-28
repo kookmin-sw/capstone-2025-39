@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:frontend/widgets/bottom_nav.dart';
 import 'package:frontend/screens/chat_screen.dart';
-import 'package:frontend/screens/login_screen.dart';
+import 'package:frontend/providers/auth_provider.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key}); // 로그인 상태 전달받음
 
   @override
   Widget build(BuildContext context) {
+    final isLoggedIn =
+        Provider.of<AuthProvider>(context).isLoggedIn; // 로그인 상태 확인
     return Scaffold(
       backgroundColor: const Color(0xFF5B7553), // 초록 배경
       bottomNavigationBar: BottomNavBar(
@@ -18,10 +21,13 @@ class HomeScreen extends StatelessWidget {
           } else if (index == 1) {
             // TODO: 채팅 기록 화면
           } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => LoginScreen()),
-            );
+            // 내 계정 or 로그인 화면으로 이동
+            if (isLoggedIn) {
+              Navigator.pushNamed(context, '/mypage');
+            } else {
+              // 로그인 화면으로 이동
+              Navigator.pushNamed(context, '/login');
+            }
           }
         },
       ),

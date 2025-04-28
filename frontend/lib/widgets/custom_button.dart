@@ -9,18 +9,40 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 400,
+      width: 382,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF648B63),
-          foregroundColor: Colors.white,
-          minimumSize: const Size.fromHeight(60),
+          padding: EdgeInsets.zero, // Gradient를 위해 내부 패딩 제거
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(100), // radius 100으로 변경
           ),
         ),
         onPressed: onPressed,
-        child: Text(text),
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment(1.00, 0.51),
+              end: Alignment(0.00, 0.49),
+              colors: [Color(0xFF5D825F), Color(0xFF90A891)], // 그라데이션 색상
+            ),
+            borderRadius: BorderRadius.circular(100),
+          ),
+          child: Container(
+            height: 55,
+            alignment: Alignment.center,
+            child: Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                height: 1.6,
+                letterSpacing: 0.2,
+                fontFamily: 'Urbanist', // 필요하면 폰트 추가
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

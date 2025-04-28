@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:frontend/screens/extra_info_screen.dart';
 import '../widgets/info_text_field.dart';
 import '../widgets/custom_password_field.dart';
 import '../widgets/custom_button.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:frontend/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,25 +48,60 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final isNewUser = responseData['isNewUser'] == true;
+        final email = responseData['email'];
+        final name = responseData['name'];
 
         // 첫 사용자 -> 추가 정보 입력 폼
         if (isNewUser) {
-          final email = responseData['email'];
-          Navigator.push(
+          // 회원 가입 성공 시
+          Provider.of<AuthProvider>(
             context,
-            MaterialPageRoute(builder: (_) => ExtraInfoScreen(email: email)),
+            listen: false,
+          ).logIn(); // 로그인 true로 상태 변경
+          // 회원가입 성공 메세지 Dialog
+          showDialog(
+            context: context,
+            barrierDismissible: false, // 팝업 바깥 터치해도 안 닫히게
+            builder: (BuildContext context) {
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        '회원가입 성공!',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF54A777), // 연한 초록
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text('Please wait...'),
+                      const SizedBox(height: 8),
+                      const Text('마이페이지로 이동합니다.'),
+                      const SizedBox(height: 24),
+                      const CircularProgressIndicator(color: Color(0xFF54A777)),
+                    ],
+                  ),
+                ),
+              );
+            },
           );
-        } else {
-          Navigator.pushReplacementNamed(context, '/home');
-        }
+          // 2초 기다렸다가 마이페이지 이동
+          await Future.delayed(const Duration(seconds: 2));
 
-        print('Google 로그인 성공: ${responseData['message']}');
-        // 예: Navigator.pushReplacementNamed(context, '/home');
-      } else {
-        print('Google 로그인 실패: ${response.body}');
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Google 로그인에 실패했습니다.')));
+          if (!mounted) return;
+          Navigator.pop(context); // Dialog 먼저 닫고
+          Navigator.pushReplacementNamed(context, '/mypage'); // 마이페이지로 이동
+          print('Google 로그인 성공: ${responseData['message']}');
+        } else {
+          // 기존 사용자 -> 로그인 성공 화면으로 이동
+        }
       }
     } catch (e) {
       if (!mounted) return;
@@ -73,6 +109,57 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Google 로그인 중 오류가 발생했습니다.')));
+      // 임시로 성공 화면 뜨게 --- !!나중에 꼭 제거!!
+      // 첫 사용자 -> 추가 정보 입력 폼
+      final isNewUser = true;
+      if (isNewUser) {
+        // 회원 가입 성공 시
+        Provider.of<AuthProvider>(
+          context,
+          listen: false,
+        ).logIn(); // 로그인 true로 상태 변경
+        // 회원가입 성공 메세지 Dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false, // 팝업 바깥 터치해도 안 닫히게
+          builder: (BuildContext context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      '회원가입 성공!',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF54A777), // 연한 초록
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Please wait...'),
+                    const SizedBox(height: 8),
+                    const Text('마이페이지로 이동합니다.'),
+                    const SizedBox(height: 24),
+                    const CircularProgressIndicator(color: Color(0xFF54A777)),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+        // 2초 기다렸다가 마이페이지 이동
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (!mounted) return;
+        Navigator.pop(context); // Dialog 먼저 닫고
+        Navigator.pushReplacementNamed(context, '/mypage'); // 마이페이지로 이동
+        // 여기까지 나중에 꼭 제거!!
+      }
     }
   }
 
