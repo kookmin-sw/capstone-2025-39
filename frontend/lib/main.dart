@@ -23,6 +23,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       home: const HomeScreen(),
       routes: {
+        '/home': (context) => const HomeScreen(),
         '/mypage': (context) => const MyPageScreen(),
         '/login': (context) => const LoginScreen(),
       },
