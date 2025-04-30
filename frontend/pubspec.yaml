@@ -43,3 +43,5 @@ flutter:
           weight: 600
         - asset: assets/fonts/Pretendard-Bold.otf
           weight: 700
+        - asset: assets/fonts/Pretendard-ExtraBold.otf
+          weight: 800

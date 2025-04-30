@@ -9,12 +9,13 @@ class MyPageScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // AppBar
       appBar: AppBar(
         title: const Text(
           'Account',
           style: TextStyle(
             fontFamily: 'Pretendard',
-            fontWeight: FontWeight.w700, // Bold
+            fontWeight: FontWeight.w800, // Bold
             color: Colors.black,
           ),
         ),
@@ -39,7 +40,7 @@ class MyPageScreen extends StatelessWidget {
                 '안녕하세요',
                 style: TextStyle(
                   fontFamily: 'Pretendard',
-                  fontWeight: FontWeight.w600, // SemiBold
+                  fontWeight: FontWeight.w800, // SemiBold
                   fontSize: 20,
                 ),
               ),
@@ -80,7 +81,7 @@ class MyPageScreen extends StatelessWidget {
                 '개인 정보',
                 style: TextStyle(
                   fontFamily: 'Pretendard',
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
@@ -91,7 +92,7 @@ class MyPageScreen extends StatelessWidget {
                 '보안',
                 style: TextStyle(
                   fontFamily: 'Pretendard',
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
@@ -123,7 +124,7 @@ class MyPageScreen extends StatelessWidget {
                 'Help Center',
                 style: TextStyle(
                   fontFamily: 'Pretendard',
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
               trailing: const Icon(Icons.arrow_forward_ios, size: 18),
@@ -134,7 +135,7 @@ class MyPageScreen extends StatelessWidget {
                 'About ChatAI',
                 style: TextStyle(
                   fontFamily: 'Pretendard',
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
               trailing: const Icon(Icons.arrow_forward_ios, size: 18),
@@ -146,12 +147,18 @@ class MyPageScreen extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: 'Pretendard',
                   color: Colors.red,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
               onTap: () {
-                Provider.of<AuthProvider>(context, listen: false).logOut();
-                Navigator.pushReplacementNamed(context, '/login');
+                Provider.of<AuthProvider>(
+                  context,
+                  listen: false,
+                ).logOut(); // 로그아웃으로 상태 변경
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/login',
+                ); // 로그인 화면 돌아가기
               },
             ),
             const SizedBox(height: 24),
