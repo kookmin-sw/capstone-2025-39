@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class InfoTextField extends StatelessWidget {
   final String hintText;
-  final IconData icon;
+  final IconData? icon;
   final TextEditingController controller;
 
   const InfoTextField({
     super.key,
     required this.hintText,
-    required this.icon,
+    this.icon, // 아이콘은 선택적으로 전달
     required this.controller,
   });
 
@@ -30,14 +30,18 @@ class InfoTextField extends StatelessWidget {
         ),
         filled: true,
         fillColor: const Color(0xFFF9FAFB), // 밝은 회색 배경
-        suffixIcon: Container(
-          margin: const EdgeInsets.only(right: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF7F8FA), // 초록색 버튼
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: Color(0xFF5E8360), size: 22),
-        ),
+        // 아이콘은 있을 경우에만 표시
+        suffixIcon:
+            icon != null
+                ? Container(
+                  margin: const EdgeInsets.only(right: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF7F8FA), // 초록색 버튼
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: Color(0xFF5E8360), size: 22),
+                )
+                : null, // 아이콘이 없으면 null
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 18,

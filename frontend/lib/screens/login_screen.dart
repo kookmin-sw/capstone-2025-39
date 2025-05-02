@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/sign_up_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../widgets/info_text_field.dart';
 import '../widgets/custom_password_field.dart';
@@ -7,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -26,90 +28,87 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleGoogleLogin() async {
     try {
       final account = await _googleSignIn.signIn();
-      if (account == null) return; // 사용자가 로그인 취소함
-
+      if (account == null) {
+        // 사용자가 로그인 취소
+        return;
+      }
       final auth = await account.authentication;
       final idToken = auth.idToken;
       final accessToken = auth.accessToken;
 
-      final url = Uri.parse('http://211.188.53.1:8080/users/oauth');
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'provider': 'google',
-          'idToken': idToken,
-          'accessToken': accessToken,
-        }),
+      final responseData = await AuthService.googleLogin(
+        idToken: idToken!,
+        accessToken: accessToken!,
       );
 
-      if (!mounted) return;
+      final isNewUser = responseData['isNewUser'] == true;
+      final email = responseData['email'];
+      final name = responseData['name'];
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        final isNewUser = responseData['isNewUser'] == true;
-        final email = responseData['email'];
-        final name = responseData['name'];
-
-        // 첫 사용자 -> 추가 정보 입력 폼
-        if (isNewUser) {
-          // 회원 가입 성공 시
-          Provider.of<AuthProvider>(
-            context,
-            listen: false,
-          ).logIn(); // 로그인 true로 상태 변경
-          // 회원가입 성공 메세지 Dialog
-          showDialog(
-            context: context,
-            barrierDismissible: false, // 팝업 바깥 터치해도 안 닫히게
-            builder: (BuildContext context) {
-              return Dialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        '회원가입 성공!',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF54A777), // 연한 초록
-                        ),
+      // 첫 사용자
+      if (isNewUser) {
+        // 회원원 가입 성공 시
+        Provider.of<AuthProvider>(
+          context,
+          listen: false,
+        ).logIn(); // 로그인 true로 상태 변경
+        // 회원가입 성공 메세지 Dialog
+        showDialog(
+          context: context,
+          barrierDismissible: false, // 팝업 바깥 터치해도 안 닫히게
+          builder: (BuildContext context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      '회원가입 성공!',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF54A777), // 연한 초록
                       ),
-                      const SizedBox(height: 16),
-                      const Text('Please wait...'),
-                      const SizedBox(height: 8),
-                      const Text('마이페이지로 이동합니다.'),
-                      const SizedBox(height: 24),
-                      const CircularProgressIndicator(color: Color(0xFF54A777)),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Please wait...'),
+                    const SizedBox(height: 8),
+                    const Text('마이페이지로 이동합니다.'),
+                    const SizedBox(height: 24),
+                    const CircularProgressIndicator(color: Color(0xFF54A777)),
+                  ],
                 ),
-              );
-            },
-          );
-          // 2초 기다렸다가 마이페이지 이동
-          await Future.delayed(const Duration(seconds: 2));
+              ),
+            );
+          },
+        );
+        // 2초 기다렸다가 마이페이지 이동
+        await Future.delayed(const Duration(seconds: 2));
 
-          if (!mounted) return;
-          Navigator.pop(context); // Dialog 먼저 닫고
-          Navigator.pushReplacementNamed(context, '/mypage'); // 마이페이지로 이동
-          print('Google 로그인 성공: ${responseData['message']}');
-        } else {
-          // 기존 사용자 -> 로그인 성공 화면으로 이동
-        }
+        if (!mounted) return;
+        Navigator.pop(context); // Dialog 먼저 닫는다.
+        Navigator.pushReplacementNamed(context, '/mypage'); // 마이페이지로 이동
+        print('Google 로그인 성공: ${responseData['message']}');
+      } else {
+        // 기존 사용자 -> 로그인 성공 화면으로 이동
+        Provider.of<AuthProvider>(
+          context,
+          listen: false,
+        ).logIn(); // 로그인 true로 상태 변경
+        Navigator.pushReplacementNamed(context, '/mypage');
       }
     } catch (e) {
+      // 로그인 실패
       if (!mounted) return;
       print('Google 로그인 중 오류 발생: $e');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Google 로그인 중 오류가 발생했습니다.')));
-      // 임시로 성공 화면 뜨게 --- !!나중에 꼭 제거!!
+      // <<!!임시로 성공 화면 뜨게 --- !!나중에 꼭 제거!!>>
       // 첫 사용자 -> 추가 정보 입력 폼
       final isNewUser = true;
       if (isNewUser) {
@@ -158,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (!mounted) return;
         Navigator.pop(context); // Dialog 먼저 닫고
         Navigator.pushReplacementNamed(context, '/mypage'); // 마이페이지로 이동
-        // 여기까지 나중에 꼭 제거!!
+        // << 여기까지 나중에 꼭 제거!! >>
       }
     }
   }
@@ -227,10 +226,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text("Don't have an account? "),
-                  GestureDetector(
-                    onTap: () {},
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SignUpScreen(),
+                        ),
+                      );
+                    },
                     child: const Text(
-                      "Sign up",
+                      "회원가입",
                       style: TextStyle(
                         color: Colors.indigo,
                         fontWeight: FontWeight.bold,
@@ -298,6 +304,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
+              // 일반 로그인 버튼
               const SizedBox(height: 24),
               Center(
                 child: CustomButton(
@@ -306,39 +313,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     final userId = emailController.text.trim();
                     final password = passwordController.text;
 
-                    final url = Uri.parse(
-                      'http://211.188.53.1:8080/users/login',
-                    );
-
                     try {
-                      final response = await http.post(
-                        url,
-                        headers: {'Content-Type': 'application/json'},
-                        body: jsonEncode({
-                          'userId': userId,
-                          'password': password,
-                        }),
+                      final responseData = await AuthService.login(
+                        userId,
+                        password,
                       );
-
-                      if (!mounted) return;
-
-                      if (response.statusCode == 200) {
-                        final responseData = jsonDecode(response.body);
-                        print('로그인 성공: ${responseData['message']}');
-                      } else {
-                        print('로그인 실패: ${response.body}');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('이메일 또는 비밀번호가 잘못되었습니다.'),
-                          ),
-                        );
-                      }
+                      print(('로그인 성공 : ${responseData['message']}'));
+                      Provider.of<AuthProvider>(
+                        context,
+                        listen: false,
+                      ).logIn(); // 로그인 true로 상태 변경
+                      Navigator.pushReplacementNamed(context, '/mypage');
                     } catch (e) {
                       if (!mounted) return;
                       print('오류 발생: $e');
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(const SnackBar(content: Text('서버 연결 오류')));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('이메일 또는 비밀번호가 잘못되었습니다.')),
+                      );
                     }
                   },
                 ),

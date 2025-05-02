@@ -19,7 +19,7 @@ class HomeScreen extends StatelessWidget {
           if (index == 0) {
             // 홈
           } else if (index == 1) {
-            // TODO: 채팅 기록 화면
+            // TO DO: 채팅 기록 화면
           } else if (index == 2) {
             // 내 계정 or 로그인 화면으로 이동
             if (isLoggedIn) {
