@@ -1,50 +1,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.INTERNET"/>
-=======
-    <!-- 네트워크 권한 -->
-    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <!-- 위치 권한 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     
->>>>>>> 55ebd0d (지도 기능 구현)
-=======
->>>>>>> e9fc20e (프로젝트 구조 수정)
-=======
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.INTERNET"/>
->>>>>>> 1213d29 (로그인 ui수정)
     <application
         android:label="frontend"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-<<<<<<< HEAD
-<<<<<<< HEAD
-	
-	<meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_map_api_key"/>
-
-=======
-        
+   
         <!-- Google Maps API 키 -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key"/>
-            
->>>>>>> 55ebd0d (지도 기능 구현)
-=======
-	
 	<meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_map_api_key"/>
 
->>>>>>> e9fc20e (프로젝트 구조 수정)
         <activity
             android:name=".MainActivity"
             android:exported="true"

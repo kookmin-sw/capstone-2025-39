@@ -35,11 +35,13 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
           horizontal: 20,
           vertical: 18,
         ),
+        // 테두리
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
         ),
 
+        // suffix아이콘
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 12),
           child: GestureDetector(

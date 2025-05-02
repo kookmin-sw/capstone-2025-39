@@ -52,8 +52,4 @@ android {
 
 flutter {
     source = "../.."
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> e9fc20e (프로젝트 구조 수정)
