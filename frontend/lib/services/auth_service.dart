@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:ui';
+import 'package:frontend/services/secure_storage_service.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
@@ -6,21 +8,35 @@ class AuthService {
 
   /// 일반 로그인
   static Future<Map<String, dynamic>> login(
-    String userId,
+    String email,
     String password,
   ) async {
     final url = Uri.parse('$_baseUrl/login');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'userId': userId, 'password': password}),
+      body: jsonEncode({'email': email, 'password': password}),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final responseData = jsonDecode(response.body);
+
+      // 토큰 저장
+      final token = responseData['token'];
+      // SecureStorage에 토큰 저장
+      if (token == null) {
+        await SecureStorageService().saveToken(token);
+      }
+
+      return responseData;
     } else {
       throw Exception('로그인 실패: ${response.body}');
     }
+  }
+
+  // 일반 로그아웃
+  static Future<void> logout() async {
+    await SecureStorageService().deleteToken();
   }
 
   /// 일반 회원가입
