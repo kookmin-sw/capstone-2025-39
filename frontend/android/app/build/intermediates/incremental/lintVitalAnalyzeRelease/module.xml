@@ -1,6 +1,6 @@
 <lint-module
     format="1"
-    dir="C:\Users\yohee\friend\frontend\android\app"
+    dir="C:\Users\yohee\LocalGuideBot-JeongneungChingu\frontend\android\app"
     name=":app"
     type="APP"
     maven="android:app:unspecified"

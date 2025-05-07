@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+// 챗봇 응답 처리 서비스
 class ChatBotService {
   /* Spring Boot 서버의 주소를 가져온다.
      'http://<your-spring-url>:<port>/chat';
@@ -11,13 +12,21 @@ class ChatBotService {
      임시로 서버 로컬에서 돌리므로 http://10.0.2.2:8080/chat 형태
   */
 
-  final String springBootUrl = 'http://211.188.53.1:8080/api/chat';
+  final String springBootUrl = 'http://223.130.152.181:8080/api/chat';
 
-  Future<Map<String, dynamic>> getReply(String input) async {
+  Future<Map<String, dynamic>> getReply(
+    String input, {
+    double? lat,
+    double? lng,
+  }) async {
     //비동기
     try {
       //요청 바디 구성
-      Map<String, String> requestBody = {"message": input};
+      Map<String, dynamic> requestBody = {
+        "message": input,
+        if (lat != null && lng != null)
+          "location": {"lat": lat, "lng": lng}, //위치 정보가 있는 경우
+      };
 
       //POST 요청
       final response = await http.post(
