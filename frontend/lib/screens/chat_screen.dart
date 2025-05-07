@@ -4,7 +4,9 @@ import '../models/chat_message.dart';
 import '../services/chatbot_service.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/chat_input_field.dart';
+import 'package:frontend/services/location_service.dart';
 
+// 챗봇 화면
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
@@ -22,7 +24,7 @@ class ChatScreenState extends State<ChatScreen> {
     'ko',
   ).format(DateTime.now());
 
-  void sendMessage(String text) {
+  void sendMessage(String text) async {
     if (text.trim().isEmpty) return;
     final formattedTime = DateFormat('a hh:mm', 'ko').format(DateTime.now());
 
@@ -31,6 +33,17 @@ class ChatScreenState extends State<ChatScreen> {
     });
 
     _controller.clear();
+
+    // 사용자의 위치를 가져오기
+    double? lat;
+    double? lng;
+
+    final position = await getCurrentLocation();
+    if (position != null) {
+      lat = position.latitude;
+      lng = position.longitude;
+      print("위도: $lat, 경도: $lng");
+    }
 
     Future.delayed(const Duration(milliseconds: 500), () async {
       final botReply = await _chatBotService.getReply(text);
@@ -76,11 +89,12 @@ class ChatScreenState extends State<ChatScreen> {
                 color: Colors.black,
               ),
             ),
+            // 뒤로가기 버튼
             Align(
               alignment: Alignment.centerLeft,
               child: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () {
+                onPressed: () async {
                   Navigator.of(context).pop(); // ← 여기서 뒤로가기
                 },
               ),

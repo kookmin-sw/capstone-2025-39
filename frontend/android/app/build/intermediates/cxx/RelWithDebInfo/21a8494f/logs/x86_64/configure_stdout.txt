@@ -13,4 +13,4 @@ Not searching for unused variables given on the command line.
 -- Detecting CXX compile features - done
 -- Configuring done
 -- Generating done
--- Build files have been written to: C:/Users/yohee/friend/frontend/android/app/.cxx/RelWithDebInfo/21a8494f/x86_64
+-- Build files have been written to: C:/Users/yohee/LocalGuideBot-JeongneungChingu/frontend/android/app/.cxx/RelWithDebInfo/21a8494f/x86_64

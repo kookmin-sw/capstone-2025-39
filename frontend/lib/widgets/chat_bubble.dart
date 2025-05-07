@@ -29,7 +29,7 @@ class ChatBubble extends StatelessWidget {
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Column(
         crossAxisAlignment:
-        isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           if (time != null && time!.isNotEmpty)
             Padding(
@@ -52,9 +52,13 @@ class ChatBubble extends StatelessWidget {
                   topLeft: const Radius.circular(16),
                   topRight: const Radius.circular(16),
                   bottomLeft:
-                  isUser ? const Radius.circular(16) : const Radius.circular(0),
+                      isUser
+                          ? const Radius.circular(16)
+                          : const Radius.circular(0),
                   bottomRight:
-                  isUser ? const Radius.circular(0) : const Radius.circular(16),
+                      isUser
+                          ? const Radius.circular(0)
+                          : const Radius.circular(16),
                 ),
               ),
               child: Text(
@@ -70,7 +74,7 @@ class ChatBubble extends StatelessWidget {
           // 지도 표시
           if (lat != null && lng != null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: ChatMap(lat: lat!, lng: lng!),
             ),
         ],

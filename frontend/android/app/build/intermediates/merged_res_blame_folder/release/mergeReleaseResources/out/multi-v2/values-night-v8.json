@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.frontend.app-mergeReleaseResources-28:/values-night-v8/values-night-v8.xml",
+            "outputFile": "com.example.frontend.app-mergeReleaseResources-34:/values-night-v8/values-night-v8.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\yohee\\friend\\frontend\\android\\app\\src\\main\\res\\values-night\\styles.xml",
+                    "source": "C:\\Users\\yohee\\LocalGuideBot-JeongneungChingu\\frontend\\android\\app\\src\\main\\res\\values-night\\styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",

@@ -1,10 +1,27 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.frontend.app-mergeReleaseResources-28:/values-el/values-el.xml",
+            "outputFile": "com.example.frontend.app-mergeReleaseResources-34:/values-el/values-el.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\yohee\\.gradle\\caches\\8.10.2\\transforms\\efac6c170b60b4944080dc71b5e361de\\transformed\\jetified-play-services-basement-18.0.0\\res\\values-el\\values.xml",
+                    "source": "C:\\Users\\yohee\\.gradle\\caches\\8.10.2\\transforms\\0f43509670beb1f53c1f6996445ca23a\\transformed\\core-1.16.0\\res\\values-el\\values-el.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,153,256,356,459,567,673,790",
+                        "endColumns": "97,102,99,102,107,105,116,100",
+                        "endOffsets": "148,251,351,454,562,668,785,886"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,27",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,153,256,356,459,567,673,3156",
+                        "endColumns": "97,102,99,102,107,105,116,100",
+                        "endOffsets": "148,251,351,454,562,668,785,3252"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\yohee\\.gradle\\caches\\8.10.2\\transforms\\48bb13e58e49cdf1e6377472107b28a8\\transformed\\jetified-play-services-basement-18.3.0\\res\\values-el\\values.xml",
                     "from": {
                         "startLines": "4",
                         "startColumns": "0",
@@ -21,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\yohee\\.gradle\\caches\\8.10.2\\transforms\\d5a90d880711c0baff6cb8ee6cb72f44\\transformed\\jetified-play-services-base-18.0.1\\res\\values-el\\values.xml",
+                    "source": "C:\\Users\\yohee\\.gradle\\caches\\8.10.2\\transforms\\b93785a04fcd49acabbaa600426866db\\transformed\\jetified-play-services-base-18.3.0\\res\\values-el\\values.xml",
                     "from": {
                         "startLines": "4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20",
                         "startColumns": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
@@ -35,23 +52,6 @@
                         "startOffsets": "790,901,1087,1219,1330,1511,1636,1754,2023,2212,2320,2490,2619,2797,2942,3011,3073",
                         "endColumns": "110,185,131,110,180,124,117,104,188,107,169,128,177,144,68,61,82",
                         "endOffsets": "896,1082,1214,1325,1506,1631,1749,1854,2207,2315,2485,2614,2792,2937,3006,3068,3151"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\yohee\\.gradle\\caches\\8.10.2\\transforms\\dfc2fbca530748e569b0737b09fa016f\\transformed\\core-1.13.1\\res\\values-el\\values-el.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,153,256,356,459,567,673,790",
-                        "endColumns": "97,102,99,102,107,105,116,100",
-                        "endOffsets": "148,251,351,454,562,668,785,886"
-                    },
-                    "to": {
-                        "startLines": "2,3,4,5,6,7,8,27",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,153,256,356,459,567,673,3156",
-                        "endColumns": "97,102,99,102,107,105,116,100",
-                        "endOffsets": "148,251,351,454,562,668,785,3252"
                     }
                 }
             ]

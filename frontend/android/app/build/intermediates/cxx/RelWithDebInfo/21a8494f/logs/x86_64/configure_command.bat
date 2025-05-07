@@ -11,10 +11,10 @@
   "-DCMAKE_ANDROID_NDK=C:\\Users\\yohee\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973" ^
   "-DCMAKE_TOOLCHAIN_FILE=C:\\Users\\yohee\\AppData\\Local\\Android\\Sdk\\ndk\\27.0.12077973\\build\\cmake\\android.toolchain.cmake" ^
   "-DCMAKE_MAKE_PROGRAM=C:\\Users\\yohee\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe" ^
-  "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\\Users\\yohee\\friend\\frontend\\android\\app\\build\\intermediates\\cxx\\RelWithDebInfo\\21a8494f\\obj\\x86_64" ^
-  "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=C:\\Users\\yohee\\friend\\frontend\\android\\app\\build\\intermediates\\cxx\\RelWithDebInfo\\21a8494f\\obj\\x86_64" ^
+  "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\\Users\\yohee\\LocalGuideBot-JeongneungChingu\\frontend\\android\\app\\build\\intermediates\\cxx\\RelWithDebInfo\\21a8494f\\obj\\x86_64" ^
+  "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=C:\\Users\\yohee\\LocalGuideBot-JeongneungChingu\\frontend\\android\\app\\build\\intermediates\\cxx\\RelWithDebInfo\\21a8494f\\obj\\x86_64" ^
   "-DCMAKE_BUILD_TYPE=RelWithDebInfo" ^
-  "-BC:\\Users\\yohee\\friend\\frontend\\android\\app\\.cxx\\RelWithDebInfo\\21a8494f\\x86_64" ^
+  "-BC:\\Users\\yohee\\LocalGuideBot-JeongneungChingu\\frontend\\android\\app\\.cxx\\RelWithDebInfo\\21a8494f\\x86_64" ^
   -GNinja ^
   -Wno-dev ^
   --no-warn-unused-cli
