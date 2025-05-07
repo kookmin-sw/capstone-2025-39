@@ -31,7 +31,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     setState(() {
       errorMessage = null;
-      isLoading = true;
+      // isLoading = true;
     });
 
     try {
@@ -45,6 +45,44 @@ class _SignUpScreenState extends State<SignUpScreen> {
         setState(() {
           isLoading = false;
         });
+        showDialog(
+          context: context,
+          barrierDismissible: false, // 팝업 바깥 터치해도 안 닫히게
+          builder: (BuildContext context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      '회원가입 성공!',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF54A777), // 연한 초록
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Please wait...'),
+                    const SizedBox(height: 8),
+                    // const Text('마이페이지로 이동합니다.'),
+                    const SizedBox(height: 24),
+                    const CircularProgressIndicator(color: Color(0xFF54A777)),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+        // 2초 기다렸다가 마이페이지 이동
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (!mounted) return;
+        Navigator.pop(context); // Dialog 먼저 닫는다.
         Navigator.pushReplacementNamed(context, '/login');
       } else {
         setState(() {
