@@ -113,14 +113,16 @@ class _ChatInputFieldState extends State<ChatInputField> {
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              width: 36,
-              height: 36,
+              width: 48,
+              height: 73,
               margin: const EdgeInsets.only(right: 10),
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.circular(100),
                 border: Border.all(width: 3, color: Colors.transparent),
                 gradient:
                     _isListening
+                        // 음성 인식 중일때 그라디언트 효과
                         ? SweepGradient(
                           colors: const [
                             Colors.green,
@@ -136,14 +138,19 @@ class _ChatInputFieldState extends State<ChatInputField> {
               ),
               child: Container(
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
+                  shape: BoxShape.rectangle,
                   color: Colors.white,
-                  border: Border.all(color: Colors.black26, width: 1),
+                  border: Border.all(color: Color(0xFFDBDBDB), width: 1),
+                  borderRadius: BorderRadius.circular(100),
                 ),
-                child: Icon(
-                  Icons.mic,
-                  size: 25,
-                  color: _isListening ? Color(0xFF5E8360) : Colors.black87,
+                child: SizedBox(
+                  width: 18,
+                  height: 25,
+                  child: Icon(
+                    Icons.mic,
+                    size: 28,
+                    color: _isListening ? Color(0xFF5E8360) : Colors.black87,
+                  ),
                 ),
               ),
             ),
