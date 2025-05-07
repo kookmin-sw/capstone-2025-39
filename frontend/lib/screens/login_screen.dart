@@ -42,8 +42,6 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       final isNewUser = responseData['isNewUser'] == true;
-      final email = responseData['email'];
-      final name = responseData['name'];
 
       // 첫 사용자
       if (isNewUser) {
@@ -318,7 +316,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         userId,
                         password,
                       );
-                      print(('로그인 성공 : ${responseData['message']}'));
+                      print(('로그인 성공 '));
                       Provider.of<AuthProvider>(
                         context,
                         listen: false,
