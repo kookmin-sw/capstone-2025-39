@@ -1,31 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../models/chat_message.dart';
-import '../services/chatbot_service.dart';
-import '../widgets/chat_bubble.dart';
-import '../widgets/chat_input_field.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:frontend/models/chat_message.dart';
+import 'package:frontend/services/chatbot_service.dart';
+import 'package:frontend/widgets/chat_bubble.dart';
+import 'package:frontend/widgets/chat_input_field.dart';
 import 'package:frontend/services/location_service.dart';
 import 'package:frontend/providers/auth_provider.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
-// 챗봇 화면
 class ChatScreen extends StatefulWidget {
   final int roomId;
   const ChatScreen({super.key, required this.roomId});
 
   @override
-  ChatScreenState createState() => ChatScreenState();
+  State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen> {
   final List<ChatMessage> messages = [];
   final TextEditingController _controller = TextEditingController();
   final ChatBotService _chatBotService = ChatBotService();
-  final box = Hive.box<ChatMessage>('chatBox');
-
   final String startDate = DateFormat(
     'yyyy.MM.dd EEEE',
     'ko',
@@ -34,15 +31,50 @@ class ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    // Hive에서 roomId에 해당하는 메시지만 불러오기
-    final saved =
-        box.values.where((msg) => msg.roomId == widget.roomId).toList();
-    messages.addAll(saved);
+    _loadMessagesFromServer();
   }
 
-  void sendMessage(String text) async {
+  Future<void> _loadMessagesFromServer() async {
+    final auth = context.read<AuthProvider>();
+    final url = Uri.parse(
+      'http://223.130.152.181:8080/api/chat/history?roomId=${widget.roomId}',
+    );
+
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer ${auth.token}'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      setState(() {
+        messages.clear();
+        messages.addAll(
+          data.map(
+            (m) => ChatMessage(
+              text: m['text'],
+              isUser: m['isUser'],
+              time: m['time'],
+              date: m['date'],
+              lat: m['lat'],
+              lng: m['lng'],
+              roomId: m['roomId'],
+            ),
+          ),
+        );
+      });
+    }
+  }
+
+  Future<void> sendMessage(String text) async {
     if (text.trim().isEmpty) return;
+
     final formattedTime = DateFormat('a hh:mm', 'ko').format(DateTime.now());
+    final auth = context.read<AuthProvider>();
+    final token = auth.token;
+    final position = await getCurrentLocation();
+    final lat = position?.latitude;
+    final lng = position?.longitude;
 
     setState(() {
       messages.add(
@@ -58,67 +90,45 @@ class ChatScreenState extends State<ChatScreen> {
 
     _controller.clear();
 
-    double? lat;
-    double? lng;
+    final botReply = await _chatBotService.getReply(
+      text,
+      token: token,
+      lat: lat,
+      lng: lng,
+      roomId: widget.roomId,
+    );
 
-    final position = await getCurrentLocation();
-    if (position != null) {
-      lat = position.latitude;
-      lng = position.longitude;
-      print("위도: $lat, 경도: $lng");
-    }
+    final replyText = (botReply['reply'] as String?)?.trim() ?? '응답이 없습니다.';
 
-    Future.delayed(const Duration(milliseconds: 500), () async {
-      final botReply = await _chatBotService.getReply(text);
-      final reply = botReply['reply'];
-      final safeReply =
-          (reply is String && reply.isNotEmpty) ? reply : '응답이 없습니다.';
+    setState(() {
+      messages.add(
+        ChatMessage(
+          text: replyText,
+          isUser: false,
+          time: '',
+          date: startDate,
+          roomId: widget.roomId,
+        ),
+      );
 
-      setState(() {
+      if (botReply['lat'] != null && botReply['lng'] != null) {
         messages.add(
           ChatMessage(
-            text: safeReply,
+            text: '',
             isUser: false,
             time: '',
             date: startDate,
+            lat: botReply['lat'],
+            lng: botReply['lng'],
             roomId: widget.roomId,
           ),
         );
-
-        if (botReply['lat'] != null && botReply['lng'] != null) {
-          messages.add(
-            ChatMessage(
-              text: '',
-              isUser: false,
-              time: '',
-              date: startDate,
-              lat: botReply['lat'],
-              lng: botReply['lng'],
-              roomId: widget.roomId,
-            ),
-          );
-        }
-      });
+      }
     });
   }
 
-  // Hive(flutter local storage)에 메세지 저장
-  Future<void> saveMessagesToHive() async {
-    final keysToDelete =
-        box.keys.where((key) {
-          final msg = box.get(key);
-          return msg is ChatMessage && msg.roomId == widget.roomId;
-        }).toList();
-
-    await box.deleteAll(keysToDelete);
-
-    for (var msg in messages) {
-      await box.add(msg);
-    }
-  }
-
-  // 서버에 메세지 저장
   Future<void> saveMessagesToServer() async {
+    final auth = context.read<AuthProvider>();
     final url = Uri.parse('http://223.130.152.181:8080/api/chat/save');
 
     final chatList =
@@ -132,69 +142,60 @@ class ChatScreenState extends State<ChatScreen> {
                 'lat': msg.lat,
                 'lng': msg.lng,
                 'roomId': msg.roomId,
+                'userId': auth.userId,
               },
             )
             .toList();
 
-    final response = await http.post(
+    await http.post(
       url,
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${auth.token}',
+      },
       body: jsonEncode({'messages': chatList}),
     );
-
-    if (response.statusCode == 200) {
-      print('서버 저장 성공');
-    } else {
-      print('서버 저장 실패: ${response.body}');
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isLoggedIn = Provider.of<AuthProvider>(context).isLoggedIn;
-    String? token = Provider.of<AuthProvider>(context).token;
-
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
+    return WillPopScope(
+      onWillPop: () async {
+        await saveMessagesToServer();
+        return true;
+      },
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        title: Stack(
-          alignment: Alignment.center,
-          children: [
-            const Text(
-              '정릉친구',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          centerTitle: true,
+          title: Stack(
+            alignment: Alignment.center,
+            children: [
+              const Text(
+                '정릉친구',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () async {
-                  final auth = Provider.of<AuthProvider>(
-                    context,
-                    listen: false,
-                  );
-                  if (auth.isLoggedIn) {
+              Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.black),
+                  onPressed: () async {
                     await saveMessagesToServer();
-                  } else {
-                    await saveMessagesToHive();
-                  }
-                  Navigator.of(context).pop();
-                },
+                    Navigator.pop(context);
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: Container(
-          color: Colors.white,
+        body: SafeArea(
           child: Column(
             children: [
               Expanded(
