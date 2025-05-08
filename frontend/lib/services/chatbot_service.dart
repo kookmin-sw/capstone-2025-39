@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:frontend/providers/auth_provider.dart';
 
 // 챗봇 응답 처리 서비스
 class ChatBotService {
@@ -12,10 +13,12 @@ class ChatBotService {
      임시로 서버 로컬에서 돌리므로 http://10.0.2.2:8080/chat 형태
   */
 
-  final String springBootUrl = 'http://223.130.152.181:8080/api/chat';
+  final String springBootUrl = 'http://223.130.152.181:8080/api/chat/ask';
+  // final String springBootUrl = 'http://22.130.152.181:8080/api/chat'; //가짜 url
 
   Future<Map<String, dynamic>> getReply(
     String input, {
+    String? token,
     double? lat,
     double? lng,
   }) async {
@@ -41,7 +44,6 @@ class ChatBotService {
         final reply = data['response'];
         final lat = data['lat'];
         final lng = data['lng'];
-
         if (lat is num && lng is num) {
           //위도, 경도가 우효한 경우 체크
           return {'reply': reply, 'lat': lat, 'lng': lng};
@@ -54,11 +56,7 @@ class ChatBotService {
       }
     } catch (e) {
       //임시로 가상 메세지 반환
-      return {
-        'reply': "요청 실패했습니다 임시 메세지로 국민대학교 반환: $e",
-        'lat': 37.610837,
-        'lng': 126.996379,
-      };
+      return {'reply': "요청 실패했습니다 $e"};
 
       // return {'reply': "요청 실패했습니다: $e"};
     }

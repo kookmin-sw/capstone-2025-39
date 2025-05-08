@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:frontend/widgets/bottom_nav.dart';
 import 'package:frontend/screens/chat_screen.dart';
 import 'package:frontend/providers/auth_provider.dart';
+import '../utils/getNextRoomId.dart';
+import 'chat_history_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key}); // 로그인 상태 전달받음
@@ -20,6 +22,10 @@ class HomeScreen extends StatelessWidget {
             // 홈
           } else if (index == 1) {
             // TO DO: 채팅 기록 화면
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ChatHistoryScreen()),
+            );
           } else if (index == 2) {
             // 내 계정 or 로그인 화면으로 이동
             if (isLoggedIn) {
@@ -58,10 +64,13 @@ class HomeScreen extends StatelessWidget {
 
               // 대화 시작 버튼
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  final newRoomId = await getNextRoomId(); // 자동 roomId 생성
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ChatScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => ChatScreen(roomId: newRoomId),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(

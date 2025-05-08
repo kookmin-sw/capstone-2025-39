@@ -1,21 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/services/secure_storage_service.dart';
 
-// 로그인 상태를 관리하는 Provider
 class AuthProvider extends ChangeNotifier {
   bool _isLoggedIn = false;
+  String? _token;
 
-  // 외부에서 로그인 상태 읽을 수 있도록 제공 getter
   bool get isLoggedIn => _isLoggedIn;
+  String? get token => _token;
 
-  // 로그인 상태 true로 변경하는 메서드
-  void logIn() {
-    _isLoggedIn = true;
-    notifyListeners(); // 상태 변경 알림
+  // 앱 시작 시 토큰 불러오기
+  Future<void> loadTokenFromStorage() async {
+    final storedToken = await SecureStorageService().getToken();
+    if (storedToken != null) {
+      _token = storedToken;
+      _isLoggedIn = true;
+      notifyListeners();
+    }
   }
 
-  // 로그인 상태 false로 변경하는 메서드
-  void logOut() {
+  // 로그인 시 호출
+  Future<void> logIn(String token) async {
+    _token = token;
+    _isLoggedIn = true;
+    await SecureStorageService().saveToken(token);
+    notifyListeners();
+  }
+
+  // 로그아웃 시 호출
+  Future<void> logOut() async {
+    _token = null;
     _isLoggedIn = false;
-    notifyListeners(); // 상태 변경 알림
+    await SecureStorageService().deleteToken();
+    notifyListeners();
   }
 }

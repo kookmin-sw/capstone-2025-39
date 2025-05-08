@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class ChatMap extends StatelessWidget {
-  //37.610837, 126.996379
+class ChatMap extends StatefulWidget {
   final double lat;
   final double lng;
   final double? userLat;
@@ -17,9 +16,15 @@ class ChatMap extends StatelessWidget {
   });
 
   @override
+  State<ChatMap> createState() => _ChatMapState();
+}
+
+class _ChatMapState extends State<ChatMap> {
+  bool liked = false;
+
+  @override
   Widget build(BuildContext context) {
-    final LatLng destination = LatLng(lat, lng);
-    // 마커 목록
+    final LatLng destination = LatLng(widget.lat, widget.lng);
     final Set<Marker> markers = {
       Marker(
         markerId: const MarkerId('destination'),
@@ -29,11 +34,11 @@ class ChatMap extends StatelessWidget {
       ),
     };
 
-    if (userLat != null && userLng != null) {
+    if (widget.userLat != null && widget.userLng != null) {
       markers.add(
         Marker(
           markerId: const MarkerId('user'),
-          position: LatLng(userLat!, userLng!),
+          position: LatLng(widget.userLat!, widget.userLng!),
           infoWindow: const InfoWindow(title: '내 위치'),
           icon: BitmapDescriptor.defaultMarkerWithHue(
             BitmapDescriptor.hueAzure,
@@ -42,7 +47,6 @@ class ChatMap extends StatelessWidget {
       );
     }
 
-    // 기본 카메라 위치 (목적지 기준)
     final CameraPosition initialCamera = CameraPosition(
       target: destination,
       zoom: 15,
@@ -56,28 +60,29 @@ class ChatMap extends StatelessWidget {
           height: 210,
           child: GoogleMap(
             initialCameraPosition: initialCamera,
-
             markers: markers,
-            myLocationEnabled: true, // 현재 위치 버튼 활성화
-            myLocationButtonEnabled: true, // 오른쪽 현재위치 버튼
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
             zoomControlsEnabled: true,
             mapToolbarEnabled: true,
           ),
         ),
-
-        // 아이콘 버튼들 위치
         Column(
           children: [
             IconButton(
-              icon: Icon(Icons.favorite_border, color: Colors.red),
+              icon: Icon(
+                liked ? Icons.favorite : Icons.favorite_border,
+                color: Colors.red,
+              ),
               onPressed: () {
-                // 좋아요 버튼 클릭시 동작
+                setState(() {
+                  liked = !liked;
+                });
               },
             ),
             IconButton(
-              icon: Icon(Icons.fullscreen, color: Colors.black),
+              icon: const Icon(Icons.fullscreen, color: Colors.black),
               onPressed: () {
-                // 전체 화면 버튼 클릭시 동작
                 _showExpandedMap(context);
               },
             ),
@@ -87,10 +92,8 @@ class ChatMap extends StatelessWidget {
     );
   }
 
-  // 지도 전체 화면으로 보기
+  // Map 전체 화면
   void _showExpandedMap(BuildContext context) {
-    bool liked = false;
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -99,43 +102,45 @@ class ChatMap extends StatelessWidget {
         final screenHeight = MediaQuery.of(context).size.height;
 
         return StatefulBuilder(
-          builder: (context, setState) {
-            return Container(
-              height: screenHeight > 645 ? 645 : screenHeight,
-              width: MediaQuery.of(context).size.width,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
-              ),
-              child: Stack(
-                children: [
-                  Column(
-                    children: [
-                      SizedBox(height: 6),
-                      // 지도 영역
-                      Padding(
-                        padding: const EdgeInsets.only(left: 9),
-                        child: SizedBox(
-                          width: 393,
-                          height: 450,
+          builder: (context, setStateModal) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 160),
+              child: Container(
+                height: screenHeight > 509 ? 509 : screenHeight,
+                width: MediaQuery.of(context).size.width,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
+                ),
+                child: Stack(
+                  children: [
+                    Column(
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          height: 470,
                           child: GoogleMap(
                             initialCameraPosition: CameraPosition(
-                              target: LatLng(lat, lng),
+                              target: LatLng(widget.lat, widget.lng),
                               zoom: 16,
                             ),
                             markers: {
                               Marker(
                                 markerId: const MarkerId('destination'),
-                                position: LatLng(lat, lng),
+                                position: LatLng(widget.lat, widget.lng),
                                 infoWindow: const InfoWindow(title: '추천 장소'),
                                 icon: BitmapDescriptor.defaultMarkerWithHue(
                                   BitmapDescriptor.hueRed,
                                 ),
                               ),
-                              if (userLat != null && userLng != null)
+                              if (widget.userLat != null &&
+                                  widget.userLng != null)
                                 Marker(
                                   markerId: const MarkerId('user'),
-                                  position: LatLng(userLat!, userLng!),
+                                  position: LatLng(
+                                    widget.userLat!,
+                                    widget.userLng!,
+                                  ),
                                   infoWindow: const InfoWindow(title: '내 위치'),
                                   icon: BitmapDescriptor.defaultMarkerWithHue(
                                     BitmapDescriptor.hueAzure,
@@ -147,121 +152,41 @@ class ChatMap extends StatelessWidget {
                             zoomControlsEnabled: true,
                           ),
                         ),
-                      ),
-
-                      // 장소 정보
-                      Padding(
-                        padding: const EdgeInsets.all(16),
+                      ],
+                    ),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 16, bottom: 16),
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            // 이미지 카드
-                            Container(
-                              width: 153,
-                              height: 153,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.grey[200],
-                                boxShadow: [
-                                  BoxShadow(
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
+                            IconButton(
+                              icon: Icon(
+                                liked ? Icons.favorite : Icons.favorite_border,
+                                color: Colors.red,
                               ),
-                              clipBehavior: Clip.antiAlias,
-                              child: Image.asset(
-                                'assets/images/basic_place_img.jpg',
-                                fit: BoxFit.cover,
-                              ),
+                              onPressed: () {
+                                setState(() {
+                                  liked = !liked;
+                                });
+                                setStateModal(() {}); // 동기화
+                              },
                             ),
-
-                            const SizedBox(width: 12),
-
-                            // 장소 정보 카드
-                            Container(
-                              width: 155,
-                              height: 153,
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
+                            const SizedBox(height: 8),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.close_fullscreen,
+                                color: Colors.black,
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  Text(
-                                    '정릉천',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: 12),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.location_on,
-                                        size: 16,
-                                        color: Colors.grey,
-                                      ),
-                                      SizedBox(width: 6),
-                                      Text(
-                                        '서울시 000',
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                              onPressed: () => Navigator.pop(context),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-
-                  // 오른쪽 하트 , 축소 아이콘
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 16, bottom: 16),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              liked ? Icons.favorite : Icons.favorite_border,
-                              color: liked ? Colors.red : Colors.red,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                liked = !liked;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 8),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.close_fullscreen,
-                              color: Colors.black,
-                            ),
-                            onPressed: () => Navigator.pop(context),
-                          ),
-                        ],
-                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
