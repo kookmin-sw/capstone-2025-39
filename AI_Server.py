@@ -4,7 +4,7 @@ from langchain.chains import RetrievalQA
 from langchain.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
-from langchain_openai import OpenAI
+from langchain_openai import ChatOpenAI
 from langchain_openai import OpenAIEmbeddings
 
 load_dotenv()
@@ -22,8 +22,9 @@ template = """당신은 정릉동의 맛집들에 대해 박식한 도우미 입
 0. context에 리뷰정보가 포함되어있는 경우, 이는 실제 주민들의 방문 후기이므로 개인정보를 위해 참고만 할 뿐, 해당 내용을 수정없이 답변으로 내보내면 안됩니다.
 1. 리뷰정보를 참고하였더라도, 당신이 직접 경험해본 것 처럼 말하지 마십시오. 당신은 어디까지나 해당 정보를 참고한 AI 도우미 일 뿐입니다.
 2. 한국어로 대답하세요.
-3. 반말로 친근하게 답변하세요.
+3. 친구를 대하듯이 답변하세요.
 4. 음식점의 음식들을 추천할때, 가격 정보가 있다면 이 정보도 알려주는 것을 권장합니다.
+5. 답변을 길게 생성하려고 하지 않아도 됩니다. 더이상 할 말이 없다면 답변을 끊으세요.
 
 
 
@@ -40,7 +41,7 @@ prompt = PromptTemplate(
     template=template,
 )
 
-llm = OpenAI(
+llm = ChatOpenAI(
     model="gpt-4.1-nano-2025-04-14",
     max_tokens=1024,
     temperature=0.7,
