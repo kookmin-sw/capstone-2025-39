@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:frontend/widgets/bottom_nav.dart';
 import 'package:frontend/screens/chat_screen.dart';
 import 'package:frontend/providers/auth_provider.dart';
-import '../utils/getNextRoomId.dart';
-import 'chat_history_screen.dart';
+import 'package:frontend/utils/getNextRoomId.dart';
+import 'package:frontend/screens/chat_history_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key}); // 로그인 상태 전달받음
@@ -65,7 +65,7 @@ class HomeScreen extends StatelessWidget {
               // 대화 시작 버튼
               ElevatedButton(
                 onPressed: () async {
-                  final newRoomId = await getNextRoomId(); // 자동 roomId 생성
+                  final int newRoomId = await getNextRoomId(); // 자동 roomId 생성
                   Navigator.push(
                     context,
                     MaterialPageRoute(

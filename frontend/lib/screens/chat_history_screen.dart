@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
-import '../models/chat_message.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:frontend/models/chat_message.dart';
 import 'chat_screen.dart';
+import 'package:frontend/services/secure_storage_service.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:frontend/widgets/bottom_nav.dart';
 import 'package:frontend/providers/auth_provider.dart';
@@ -15,30 +18,86 @@ class ChatHistoryScreen extends StatefulWidget {
 }
 
 class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
-  final box = Hive.box<ChatMessage>('chatBox');
   Map<int, ChatMessage> previews = {};
 
   @override
   void initState() {
     super.initState();
-    _loadPreviews();
+    _loadPreviewsFromServer();
   }
 
-  // hive 저장 내용 로드
-  void _loadPreviews() {
-    previews.clear();
-    for (var msg in box.values) {
-      if (!previews.containsKey(msg.roomId)) {
+  Future<void> _loadPreviewsFromServer() async {
+    final auth = context.read<AuthProvider>();
+    final url = Uri.parse('http://223.130.152.181:8080/api/chat/room');
+
+    final response = await http.get(
+      url,
+      headers: {'Authorization': 'Bearer ${auth.token}'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      previews.clear();
+      for (var item in data) {
+        final msg = ChatMessage(
+          text: item['text'],
+          isUser: item['isUser'],
+          time: item['time'],
+          date: item['date'],
+          lat: item['lat'],
+          lng: item['lng'],
+          roomId: item['roomId'],
+        );
         previews[msg.roomId] = msg;
       }
+      setState(() {});
     }
-    setState(() {});
+  }
+
+  Future<bool> deleteRoom(int roomId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            title: const Text('기록 삭제'),
+            content: const Text('이 채팅 기록을 삭제하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('삭제'),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmed ?? false) {
+      final auth = context.read<AuthProvider>();
+      final url = Uri.parse(
+        'http://223.130.152.181:8080/api/chat/room/$roomId',
+      );
+
+      final res = await http.delete(
+        url,
+        headers: {'Authorization': 'Bearer ${auth.token}'},
+      );
+
+      if (res.statusCode == 200) {
+        setState(() {
+          previews.remove(roomId);
+        });
+        return true;
+      }
+    }
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
-    final isLoggedIn =
-        Provider.of<AuthProvider>(context).isLoggedIn; // 로그인 상태 확인
+    final isLoggedIn = Provider.of<AuthProvider>(context).isLoggedIn;
     final sorted =
         previews.entries.toList()
           ..sort((a, b) => b.value.time.compareTo(a.value.time));
@@ -50,41 +109,15 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         title: const Text('History'),
         centerTitle: true,
         actions: [
-          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
           IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder:
-                    (_) => AlertDialog(
-                      title: const Text('기록 삭제'),
-                      content: const Text('모든 채팅 기록을 삭제하시겠습니까?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('취소'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            box.clear();
-                            setState(() {
-                              previews.clear();
-                            });
-                            Navigator.pop(context);
-                          },
-                          child: const Text('삭제'),
-                        ),
-                      ],
-                    ),
-              );
-            },
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadPreviewsFromServer,
           ),
         ],
       ),
       body: Column(
         children: [
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
               padding: EdgeInsets.zero,
@@ -103,133 +136,67 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                     horizontal: 16,
                     vertical: 8,
                   ),
-                  child: Stack(
-                    children: [
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () async {
-                            final confirmed = await showDialog<bool>(
-                              context: context,
-                              builder:
-                                  (_) => AlertDialog(
-                                    title: const Text('삭제 확인'),
-                                    content: const Text('이 채팅 기록을 삭제하시겠습니까?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed:
-                                            () => Navigator.pop(context, false),
-                                        child: const Text('취소'),
-                                      ),
-                                      TextButton(
-                                        onPressed:
-                                            () => Navigator.pop(context, true),
-                                        child: const Text('삭제'),
-                                      ),
-                                    ],
-                                  ),
-                            );
-
-                            if (confirmed ?? false) {
-                              final keysToDelete =
-                                  box.keys.where((key) {
-                                    final m = box.get(key);
-                                    return m is ChatMessage &&
-                                        m.roomId == msg.roomId;
-                                  }).toList();
-
-                              box.deleteAll(keysToDelete);
-                              setState(() {
-                                previews.remove(msg.roomId);
-                              });
-                            }
-                          },
-                          // 삭제 버튼 영역
-                          child: Container(
-                            height: 75,
-                            margin: const EdgeInsets.only(left: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            alignment: Alignment.centerRight,
-                            padding: const EdgeInsets.only(right: 20),
-                            child: const Icon(
-                              Icons.delete,
-                              color: Colors.white,
+                  child: Dismissible(
+                    key: ValueKey(msg.roomId),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 20),
+                      color: Colors.red,
+                      child: const Icon(Icons.delete, color: Colors.white),
+                    ),
+                    confirmDismiss: (_) => deleteRoom(msg.roomId),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(15),
+                      onTap:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ChatScreen(roomId: msg.roomId),
                             ),
                           ),
+                      child: Container(
+                        height: 77,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
                         ),
-                      ),
-
-                      // 카드 위로 슬라이드
-                      Slidable(
-                        key: ValueKey(msg.roomId),
-                        endActionPane: ActionPane(
-                          motion: const ScrollMotion(),
-                          extentRatio: 0.2,
-                          dismissible: null, // 슬라이드로 삭제 안함 (버튼만 사용)
-                          children: [],
-                        ),
-                        child: ClipRRect(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFAFAFA),
                           borderRadius: BorderRadius.circular(15),
-                          child: Material(
-                            color: const Color(0xFFFAFAFA),
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (_) => ChatScreen(roomId: msg.roomId),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                height: 77,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            preview,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 15,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 6),
-                                          Text(
-                                            '$date   -   $time',
-                                            style: const TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    preview,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
                                     ),
-                                    const Icon(Icons.chevron_right),
-                                  ],
-                                ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    '$date   -   $time',
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
+                            const Icon(Icons.chevron_right),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 );
               },
@@ -241,20 +208,16 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         currentIndex: 1,
         onTap: (index) {
           if (index == 0) {
-            // 홈
             Navigator.pushNamed(context, '/home');
           } else if (index == 1) {
-            // TO DO: 채팅 기록 화면
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const ChatHistoryScreen()),
             );
           } else if (index == 2) {
-            // 내 계정 or 로그인 화면으로 이동
             if (isLoggedIn) {
               Navigator.pushNamed(context, '/mypage');
             } else {
-              // 로그인 화면으로 이동
               Navigator.pushNamed(context, '/login');
             }
           }
