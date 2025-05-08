@@ -1,4 +1,4 @@
-#Wed May 07 17:38:02 KST 2025
+#Thu May 08 15:44:20 KST 2025
 base.1=C\:\\Users\\yohee\\LocalGuideBot-JeongneungChingu\\frontend\\android\\app\\build\\intermediates\\dex\\release\\mergeDexRelease\\classes2.dex
 path.1=classes2.dex
 base.0=C\:\\Users\\yohee\\LocalGuideBot-JeongneungChingu\\frontend\\android\\app\\build\\intermediates\\dex\\release\\mergeDexRelease\\classes.dex

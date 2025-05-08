@@ -4,11 +4,12 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../widgets/info_text_field.dart';
 import '../widgets/custom_password_field.dart';
 import '../widgets/custom_button.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:frontend/services/auth_service.dart';
+import 'package:frontend/widgets/bottom_nav.dart';
+import 'package:frontend/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -25,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
     scopes: ['email', 'https://www.googleapis.com/auth/userinfo.profile'],
   );
 
+  // 구글 로그인
   Future<void> _handleGoogleLogin() async {
     try {
       final account = await _googleSignIn.signIn();
@@ -49,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Provider.of<AuthProvider>(
           context,
           listen: false,
-        ).logIn(); // 로그인 true로 상태 변경
+        ).logIn(accessToken); // 로그인 true로 상태 변경
         // 회원가입 성공 메세지 Dialog
         showDialog(
           context: context,
@@ -96,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Provider.of<AuthProvider>(
           context,
           listen: false,
-        ).logIn(); // 로그인 true로 상태 변경
+        ).logIn(accessToken); // 로그인 true로 상태 변경
         Navigator.pushReplacementNamed(context, '/mypage');
       }
     } catch (e) {
@@ -106,84 +108,16 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Google 로그인 중 오류가 발생했습니다.')));
-      // <<!!임시로 성공 화면 뜨게 --- !!나중에 꼭 제거!!>>
-      // 첫 사용자 -> 추가 정보 입력 폼
-      final isNewUser = true;
-      if (isNewUser) {
-        // 회원 가입 성공 시
-        Provider.of<AuthProvider>(
-          context,
-          listen: false,
-        ).logIn(); // 로그인 true로 상태 변경
-        // 회원가입 성공 메세지 Dialog
-        showDialog(
-          context: context,
-          barrierDismissible: false, // 팝업 바깥 터치해도 안 닫히게
-          builder: (BuildContext context) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      '회원가입 성공!',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF54A777), // 연한 초록
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text('Please wait...'),
-                    const SizedBox(height: 8),
-                    const Text('마이페이지로 이동합니다.'),
-                    const SizedBox(height: 24),
-                    const CircularProgressIndicator(color: Color(0xFF54A777)),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-        // 2초 기다렸다가 마이페이지 이동
-        await Future.delayed(const Duration(seconds: 2));
-
-        if (!mounted) return;
-        Navigator.pop(context); // Dialog 먼저 닫고
-        Navigator.pushReplacementNamed(context, '/mypage'); // 마이페이지로 이동
-        // << 여기까지 나중에 꼭 제거!! >>
-      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoggedIn =
+        Provider.of<AuthProvider>(context).isLoggedIn; // 로그인 상태 확인
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        title: Stack(
-          alignment: Alignment.center,
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+      appBar: AppBar(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -312,15 +246,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     final password = passwordController.text;
 
                     try {
-                      final responseData = await AuthService.login(
-                        userId,
-                        password,
-                      );
+                      final result = await AuthService.login(userId, password);
+                      final token = result['accessToken'];
+
+                      // 로그인 상태 및 토큰 저장
                       print(('로그인 성공 '));
                       Provider.of<AuthProvider>(
                         context,
                         listen: false,
-                      ).logIn(); // 로그인 true로 상태 변경
+                      ).logIn(token); // 로그인 true로 상태 변경
                       Navigator.pushReplacementNamed(context, '/mypage');
                     } catch (e) {
                       if (!mounted) return;
@@ -335,6 +269,26 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: 2,
+        onTap: (index) {
+          if (index == 0) {
+            // 홈
+            Navigator.pushNamed(context, '/home');
+          } else if (index == 1) {
+            // TO DO: 채팅 기록 화면
+            Navigator.pushNamed(context, '/home');
+          } else if (index == 2) {
+            // 내 계정 or 로그인 화면으로 이동
+            if (isLoggedIn) {
+              Navigator.pushNamed(context, '/mypage');
+            } else {
+              // 로그인 화면으로 이동
+              Navigator.pushNamed(context, '/login');
+            }
+          }
+        },
       ),
     );
   }

@@ -122,7 +122,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 "회원 가입",
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 96),
+              const SizedBox(height: 60),
               // 이름
               const Text("이름"),
               const SizedBox(height: 8),
