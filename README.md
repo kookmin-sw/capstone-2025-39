@@ -98,10 +98,14 @@ AI_server
 
 ### 5. 기술스택
 
-Client: Flutter
+Client: ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 
-Main Server: Spring boot
+Main Server: ![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
 
-AI Server: Flask, Langchain
+AI Server: ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white) ![LangChain](https://img.shields.io/badge/LangChain-00B3EC?style=for-the-badge&logoColor=white)
 
-deploy: Docker
+Deploy: ![EC2](https://img.shields.io/badge/AWS_EC2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+
+Data Crawling: ![Selenium](https://img.shields.io/badge/Selenium-43B02A?style=for-the-badge&logoColor=white)
+
+
