@@ -57,21 +57,22 @@ qa_chain = RetrievalQA.from_chain_type(
 )
 
 
-app = Flask(__name__)
+# app = Flask(__name__)
 
-@app.route('/chat', methods=['POST'])
-def handle_chat():
-    # 요청에서 JSON 데이터 추출
-    data = request.get_json()
-    user_input = data.get('message', '')
-    result = qa_chain.invoke(user_input)
+# @app.route('/chat', methods=['POST'])
+# def handle_chat():
+#     # 요청에서 JSON 데이터 추출
+#     data = request.get_json()
+#     user_input = data.get('message', '')
+#     result = qa_chain.invoke(user_input)
 
-    print(f"받은 메시지: {user_input}\n")
-    print(f"반환 결과: {result}")
+#     print(f"받은 메시지: {user_input}\n")
+#     print(f"반환 결과: {result}")
 
-    response_text = f"AI 응답: '{result['result']}' "
+#     response_text = f"AI 응답: '{result['result']}' "
 
-    return jsonify({'response': response_text})
+#     return jsonify({'response': response_text})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # app.run(host='0.0.0.0', port=5000, debug=True)
+    print(qa_chain.invoke(input("입력: ")))
