@@ -71,7 +71,7 @@ Common
 git clone https://github.com/kookmin-sw/capstone-2025-39.git
 ```
 
-<summary>Client</summary>
+Client
 <div markdown="1">
 
     cd src/client/ 
@@ -80,7 +80,7 @@ git clone https://github.com/kookmin-sw/capstone-2025-39.git
 
 </div>
 
-<summary>Main_server</summary>
+Main_server
 <div markdown="1">
     
     cd src/server/
@@ -88,7 +88,7 @@ git clone https://github.com/kookmin-sw/capstone-2025-39.git
 
 </div>
 
-<summary>AI_server</summary>
+AI_server
 <div markdown="1">
 
     cd src/AI_server
