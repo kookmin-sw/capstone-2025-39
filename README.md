@@ -52,9 +52,43 @@ AI 기술로 지역 경제의 가치를 재발견하고, 더 따뜻한 커뮤니
 
 ### 3. 팀 소개
 
-팀을 소개하세요.
+<div align='center'>
+  
+<table>
+    <thead>
+        <tr>
+            <th colspan="5"> Team WeQuiz </th>
+        </tr>
+    </thead>
+    <tbody>
+         <tr>
+           <td align='center'><a href="https://github.com/NathnSong" target='_blank'><img src="https://avatars.githubusercontent.com/u/198164727?s=88&v=4" width="100" height="100"></td>
+           <td align='center'><a href="https://github.com/3004yechan" target='_blank'><img src="https://avatars.githubusercontent.com/u/62199985?v=4" width="100" height="100"></td>
+           <td align='center'><a href="https://github.com/LEEByeongIn" target='_blank'><img src="https://avatars.githubusercontent.com/u/173124103?s=88&v=4" width="100" height="100"></td>
+           <td align='center'><a href="https://github.com/KYH-ha" target='_blank'><img src="https://avatars.githubusercontent.com/u/203066826?s=88&v=4" width="100" height="100"></td>
+         </tr>
+         <tr>
+           <td align='center'>송나단(팀장)</td>
+           <td align='center'>차예찬</td>
+           <td align='center'>이병인</td>
+           <td align='center'>강영환</td>
+         </tr>
+         <tr>
+           <td align='center'>🎨</td>
+           <td align='center'>🤖</td>
+           <td align='center'>⚙️</td>
+           <td align='center'>⚙️</td>
+         </tr>
+         <tr>
+           <td align='center'>Front-end Developer</td>
+           <td align='center'>AI Engineer</td>
+           <td align='center'>Back-end Developer</td>
+           <td align='center'>Back-end Developer</td>
+         </tr>
+    </tbody>
+</table>
 
-팀원정보 및 담당이나 사진 및 SNS를 이용하여 소개하세요.
+</div> 
 
 ### 4. 사용법
 
