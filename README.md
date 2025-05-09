@@ -57,7 +57,7 @@ AI 기술로 지역 경제의 가치를 재발견하고, 더 따뜻한 커뮤니
 <table>
     <thead>
         <tr>
-            <th colspan="5"> Team WeQuiz </th>
+            <th colspan="5"> 정릉친구 </th>
         </tr>
     </thead>
     <tbody>
