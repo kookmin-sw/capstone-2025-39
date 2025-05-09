@@ -111,6 +111,7 @@ AI_server
 ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white) ![LangChain](https://img.shields.io/badge/LangChain-00B3EC?style=for-the-badge&logoColor=white)
 ![FAISS](https://img.shields.io/badge/FAISS-2E9AFE?style=for-the-badge&logoColor=white)
 
-
+### 6. 시스템 구조도
+<img src="./docs/images/system-architecture.png" width="800"/>
 
 
