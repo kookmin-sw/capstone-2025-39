@@ -42,7 +42,7 @@ AI 기술로 지역 경제의 가치를 재발견하고, 더 따뜻한 커뮤니
            <td align='center'><a href="https://github.com/KYH-ha" target='_blank'><img src="https://avatars.githubusercontent.com/u/203066826?s=88&v=4" width="100" height="100"></td>
          </tr>
          <tr>
-           <td align='center'>송나단(팀장)</td>
+           <td align='center'>송나단</td>
            <td align='center'>차예찬</td>
            <td align='center'>이병인</td>
            <td align='center'>강영환</td>
