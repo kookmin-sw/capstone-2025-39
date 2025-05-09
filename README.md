@@ -66,7 +66,35 @@ AI 기술로 지역 경제의 가치를 재발견하고, 더 따뜻한 커뮤니
 
 ### 4. 사용법
 
-소스코드제출시 설치법이나 사용법을 작성하세요.
+Common
+```bash
+git clone https://github.com/kookmin-sw/capstone-2025-39.git
+```
+
+<summary>Client</summary>
+<div markdown="1">
+
+    cd src/client/ 
+    yarn install
+    yarn run dev
+
+</div>
+
+<summary>Main_server</summary>
+<div markdown="1">
+    
+    cd src/server/
+    docker-compose up -d
+
+</div>
+
+<summary>AI_server</summary>
+<div markdown="1">
+
+    cd src/AI_server
+    docker-compose up -d
+
+</div>
 
 ### 5. 기술스택
 
