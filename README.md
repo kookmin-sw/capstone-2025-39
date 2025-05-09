@@ -98,4 +98,8 @@ AI_server
 
 ### 5. 기술스택
 
-추가적인 내용은 자유롭게 작성하세요.
+Client: Flutter
+Main Server: Spring boot
+AI Server: Flask, Langchain
+
+deploy: Docker
