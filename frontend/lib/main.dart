@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/chat_message.dart';
 import 'package:frontend/screens/chat_history_screen.dart';
-import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontend/screens/home_screen.dart';
@@ -31,6 +30,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(fontFamily: 'Pretendard'),
       home: const AuthGate(), // 초기 화면 분기 (로그인 여부에 따라)
       routes: {
         '/home': (context) => const HomeScreen(),

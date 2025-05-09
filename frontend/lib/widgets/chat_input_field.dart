@@ -200,6 +200,11 @@ class _ChatInputFieldState extends State<ChatInputField> {
                     },
                     decoration: InputDecoration(
                       hintText: 'Message...',
+                      hintStyle: const TextStyle(
+                        color: Colors.grey, // 원하는 색상으로 변경
+                        fontWeight: FontWeight.w500,
+                      ),
+
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
                         vertical: 10,

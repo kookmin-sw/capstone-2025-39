@@ -45,6 +45,9 @@ class _ChatScreenState extends State<ChatScreen> {
       headers: {'Authorization': 'Bearer ${auth.token}'},
     );
 
+    print("[loadMessages] Status: ${response.statusCode}");
+    print("[loadMessages] Body: ${utf8.decode(response.bodyBytes)}");
+
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
       setState(() {
@@ -63,6 +66,8 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         );
       });
+    } else {
+      print(" Failed to load messages: ${response.statusCode}");
     }
   }
 
@@ -130,7 +135,22 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> saveMessagesToServer() async {
     final auth = context.read<AuthProvider>();
     final url = Uri.parse('http://223.130.152.181:8080/api/chat/save');
-
+    print(
+      messages
+          .map(
+            (msg) => {
+              'text': msg.text,
+              'isUser': msg.isUser,
+              'time': msg.time,
+              'date': msg.date,
+              'lat': msg.lat,
+              'lng': msg.lng,
+              'roomId': msg.roomId,
+              'userId': auth.userId,
+            },
+          )
+          .toList(),
+    );
     final chatList =
         messages
             .map(
@@ -147,14 +167,25 @@ class _ChatScreenState extends State<ChatScreen> {
             )
             .toList();
 
-    await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${auth.token}',
-      },
-      body: jsonEncode({'messages': chatList}),
-    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${auth.token}',
+        },
+        body: jsonEncode(chatList), // 🔁 배열 자체를 루트로 보냄
+      );
+
+      print("💾 [SaveMessages] Status: ${response.statusCode}");
+      print("💾 [SaveMessages] Body: ${utf8.decode(response.bodyBytes)}");
+
+      if (response.statusCode != 200) {
+        print("❌ [SaveMessages] 저장 실패");
+      }
+    } catch (e) {
+      print("❗ [SaveMessages] 예외 발생: $e");
+    }
   }
 
   @override
@@ -178,7 +209,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 '정릉친구',
                 style: TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                   color: Colors.black,
                 ),
               ),
@@ -211,12 +242,19 @@ class _ChatScreenState extends State<ChatScreen> {
                         children: [
                           const Text(
                             '새로운 채팅을 시작합니다',
-                            style: TextStyle(fontSize: 14),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF3F454D),
+                            ),
                           ),
                           const SizedBox(height: 6),
                           Text(
                             startDate,
-                            style: const TextStyle(color: Colors.grey),
+                            style: const TextStyle(
+                              color: Color(0xFF3F454D),
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                           const SizedBox(height: 20),
                         ],

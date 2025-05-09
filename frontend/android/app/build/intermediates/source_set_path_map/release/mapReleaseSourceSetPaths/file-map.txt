@@ -23,7 +23,7 @@ com.example.frontend.app-fragment-1.7.1-21 C:\Users\yohee\.gradle\caches\8.10.2\
 com.example.frontend.app-jetified-savedstate-1.2.1-22 C:\Users\yohee\.gradle\caches\8.10.2\transforms\d8f536ab661db8c110fa8f555d4045bd\transformed\jetified-savedstate-1.2.1\res
 com.example.frontend.app-jetified-play-services-maps-18.2.0-23 C:\Users\yohee\.gradle\caches\8.10.2\transforms\f104be3ac9e19655348c2861d0764aad\transformed\jetified-play-services-maps-18.2.0\res
 com.example.frontend.app-jetified-startup-runtime-1.1.1-24 C:\Users\yohee\.gradle\caches\8.10.2\transforms\ffafe5f631203f4924364ba072ee19e0\transformed\jetified-startup-runtime-1.1.1\res
-com.example.frontend.app-release-25 C:\Users\yohee\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_plugin_android_lifecycle-2.0.27\android\build\intermediates\packaged_res\release\packageReleaseResources
+com.example.frontend.app-release-25 C:\Users\yohee\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_plugin_android_lifecycle-2.0.28\android\build\intermediates\packaged_res\release\packageReleaseResources
 com.example.frontend.app-release-26 C:\Users\yohee\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_secure_storage-9.2.4\android\build\intermediates\packaged_res\release\packageReleaseResources
 com.example.frontend.app-release-27 C:\Users\yohee\AppData\Local\Pub\Cache\hosted\pub.dev\geolocator_android-5.0.1+1\android\build\intermediates\packaged_res\release\packageReleaseResources
 com.example.frontend.app-release-28 C:\Users\yohee\AppData\Local\Pub\Cache\hosted\pub.dev\google_maps_flutter_android-2.16.0\android\build\intermediates\packaged_res\release\packageReleaseResources

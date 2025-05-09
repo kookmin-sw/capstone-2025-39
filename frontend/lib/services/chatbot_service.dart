@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 class ChatBotService {
   final String springBootUrl = 'http://223.130.152.181:8080/api/chat/ask';
+  // final String springBootUrl = 'http://22.130.152.181:8080/api/chat/ask'; // 가짜
 
   Future<Map<String, dynamic>> getReply(
     String input, {
@@ -49,17 +50,18 @@ class ChatBotService {
         final reply = data['response'];
         final lat = data['lat'];
         final lng = data['lng'];
+        print("-> 챗봇 응답(디코드): $data");
 
         if (lat is num && lng is num) {
           return {'reply': reply, 'lat': lat, 'lng': lng};
         } else {
-          return {'reply': reply};
+          return {'reply': reply, 'lat': 37.610827, 'lng': 126.996350};
         }
       } else {
         return {'reply': "챗봇 응답 실패: 다시 시도해주세요 (${response.statusCode})"};
       }
     } catch (e) {
-      return {'reply': "요청 실패: $e"};
+      return {'reply': "요청 실패: $e", 'lat': 37.610827, 'lng': 126.996350};
     }
   }
 }

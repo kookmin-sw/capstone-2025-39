@@ -18,6 +18,12 @@ class BottomNavBar extends StatelessWidget {
       backgroundColor: Colors.white,
       selectedItemColor: Color(0xFF5B7553), // 초록색 계열로 변경 가능
       unselectedItemColor: Colors.grey,
+      selectedLabelStyle: const TextStyle(
+        fontWeight: FontWeight.w500, // 선택된 항목의 텍스트 스타일
+      ),
+      unselectedLabelStyle: const TextStyle(
+        fontWeight: FontWeight.w500, // 선택되지 않은 항목의 텍스트 스타일
+      ),
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
         BottomNavigationBarItem(icon: Icon(Icons.chat), label: '채팅 기록'),

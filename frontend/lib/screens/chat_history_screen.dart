@@ -5,8 +5,6 @@ import 'dart:convert';
 
 import 'package:frontend/models/chat_message.dart';
 import 'chat_screen.dart';
-import 'package:frontend/services/secure_storage_service.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:frontend/widgets/bottom_nav.dart';
 import 'package:frontend/providers/auth_provider.dart';
 
@@ -26,31 +24,49 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     _loadPreviewsFromServer();
   }
 
+  // 전체 채팅 기록을 서버에서 가져오는 메서드
   Future<void> _loadPreviewsFromServer() async {
     final auth = context.read<AuthProvider>();
-    final url = Uri.parse('http://223.130.152.181:8080/api/chat/room');
+    final url = Uri.parse('http://223.130.152.181:8080/api/chat/rooms');
 
     final response = await http.get(
       url,
       headers: {'Authorization': 'Bearer ${auth.token}'},
     );
 
+    print("[HistoryLoad] -> 응답 상태 코드: ${response.statusCode}");
+    print("[HistoryLoad] -> 응답 본문: ${response.body}");
+
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      previews.clear();
+      final decoded = utf8.decode(response.bodyBytes); // 한글 깨짐 방지
+      final List<dynamic> data = jsonDecode(decoded); // 전체 메시지 배열
+
+      // roomId별 최신 메시지만 저장
+      Map<int, ChatMessage> latestByRoom = {};
+
       for (var item in data) {
         final msg = ChatMessage(
           text: item['text'],
-          isUser: item['isUser'],
+          isUser: item['user'],
           time: item['time'],
           date: item['date'],
           lat: item['lat'],
           lng: item['lng'],
           roomId: item['roomId'],
         );
-        previews[msg.roomId] = msg;
+
+        // 이미 있는 메시지보다 시간이 더 나중일 경우에만 갱신
+        if (!latestByRoom.containsKey(msg.roomId) ||
+            msg.time.compareTo(latestByRoom[msg.roomId]!.time) > 0) {
+          latestByRoom[msg.roomId] = msg;
+        }
       }
-      setState(() {});
+
+      setState(() {
+        previews = latestByRoom;
+      });
+    } else {
+      print('❌ 불러오기 실패: ${response.statusCode}');
     }
   }
 
@@ -77,7 +93,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     if (confirmed ?? false) {
       final auth = context.read<AuthProvider>();
       final url = Uri.parse(
-        'http://223.130.152.181:8080/api/chat/room/$roomId',
+        'http://223.130.152.181:8080/api/chat/delete/$roomId',
       );
 
       final res = await http.delete(
@@ -210,10 +226,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
           if (index == 0) {
             Navigator.pushNamed(context, '/home');
           } else if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ChatHistoryScreen()),
-            );
+            Navigator.pushNamed(context, '/history');
           } else if (index == 2) {
             if (isLoggedIn) {
               Navigator.pushNamed(context, '/mypage');

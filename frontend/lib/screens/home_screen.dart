@@ -42,25 +42,39 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // 말풍선 아이콘
-              Image.asset(
-                'assets/images/home_icon.png',
-                width: 150,
-                height: 150,
-              ),
-              const SizedBox(height: 24),
-
-              // 설명 텍스트
+              SizedBox(height: 80),
               const Text(
-                'Start chatting now.\nYou can ask me anything.',
+                'CHINGU',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  height: 1.5,
+                  color: Color(0xFFE5E6E1),
+                  fontFamily: 'Nunito',
+                  fontSize: 39,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: 241,
+                child: Text(
+                  '마을 가이드\n정릉친구',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: const Color(0xFFE5E6E1),
+                    fontSize: 14,
+                    fontFamily: 'Nunito',
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+              SizedBox(height: 60),
+              // 말풍선 아이콘
+              Image.asset(
+                'assets/images/home_img.png',
+                width: 278,
+                height: 278,
+              ),
+              const SizedBox(height: 60),
 
               // 대화 시작 버튼
               ElevatedButton(
@@ -74,8 +88,8 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  minimumSize: const Size(250, 60),
+                  backgroundColor: Color(0xFF90A891),
+                  minimumSize: const Size(361, 60),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
@@ -84,7 +98,7 @@ class HomeScreen extends StatelessWidget {
                   '대화 시작하기',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Color(0xFF5B7553),
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

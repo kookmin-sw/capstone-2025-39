@@ -92,6 +92,32 @@ class _ChatMapState extends State<ChatMap> {
     );
   }
 
+  Set<Marker> _buildMarkers() {
+    final markers = <Marker>{
+      Marker(
+        markerId: const MarkerId('destination'),
+        position: LatLng(widget.lat, widget.lng),
+        infoWindow: const InfoWindow(title: '추천 장소'),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+      ),
+    };
+
+    if (widget.userLat != null && widget.userLng != null) {
+      markers.add(
+        Marker(
+          markerId: const MarkerId('user'),
+          position: LatLng(widget.userLat!, widget.userLng!),
+          infoWindow: const InfoWindow(title: '내 위치'),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueAzure,
+          ),
+        ),
+      );
+    }
+
+    return markers;
+  }
+
   // Map 전체 화면
   void _showExpandedMap(BuildContext context) {
     showModalBottomSheet(
@@ -100,89 +126,70 @@ class _ChatMapState extends State<ChatMap> {
       backgroundColor: Colors.transparent,
       builder: (context) {
         final screenHeight = MediaQuery.of(context).size.height;
+        final screenWidth = MediaQuery.of(context).size.width;
+        final bottomPadding = MediaQuery.of(context).padding.bottom;
 
         return StatefulBuilder(
           builder: (context, setStateModal) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 160),
-              child: Container(
-                height: screenHeight > 509 ? 509 : screenHeight,
-                width: MediaQuery.of(context).size.width,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
-                ),
+            return Container(
+              height: screenHeight,
+              width: screenWidth,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
+              ),
+              child: SafeArea(
+                top: false, // 상단은 구글 맵으로 채우므로 제외
                 child: Stack(
                   children: [
-                    Column(
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          height: 470,
-                          child: GoogleMap(
-                            initialCameraPosition: CameraPosition(
-                              target: LatLng(widget.lat, widget.lng),
-                              zoom: 16,
-                            ),
-                            markers: {
-                              Marker(
-                                markerId: const MarkerId('destination'),
-                                position: LatLng(widget.lat, widget.lng),
-                                infoWindow: const InfoWindow(title: '추천 장소'),
-                                icon: BitmapDescriptor.defaultMarkerWithHue(
-                                  BitmapDescriptor.hueRed,
-                                ),
+                    // 지도 전체 영역
+                    Positioned.fill(
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: GoogleMap(
+                              initialCameraPosition: CameraPosition(
+                                target: LatLng(widget.lat, widget.lng),
+                                zoom: 16,
                               ),
-                              if (widget.userLat != null &&
-                                  widget.userLng != null)
-                                Marker(
-                                  markerId: const MarkerId('user'),
-                                  position: LatLng(
-                                    widget.userLat!,
-                                    widget.userLng!,
-                                  ),
-                                  infoWindow: const InfoWindow(title: '내 위치'),
-                                  icon: BitmapDescriptor.defaultMarkerWithHue(
-                                    BitmapDescriptor.hueAzure,
-                                  ),
-                                ),
-                            },
-                            myLocationEnabled: true,
-                            myLocationButtonEnabled: true,
-                            zoomControlsEnabled: true,
+                              markers: _buildMarkers(),
+                              myLocationEnabled: true,
+                              myLocationButtonEnabled: true,
+                              zoomControlsEnabled: true,
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 60), // 아이콘 영역 확보
+                        ],
+                      ),
                     ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 16, bottom: 16),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                liked ? Icons.favorite : Icons.favorite_border,
-                                color: Colors.red,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  liked = !liked;
-                                });
-                                setStateModal(() {}); // 동기화
-                              },
+
+                    // 하단 오른쪽 아이콘 영역 (SafeArea 고려)
+                    Positioned(
+                      bottom: 16 + bottomPadding,
+                      right: 16,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              liked ? Icons.favorite : Icons.favorite_border,
+                              color: Colors.red,
                             ),
-                            const SizedBox(height: 8),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.close_fullscreen,
-                                color: Colors.black,
-                              ),
-                              onPressed: () => Navigator.pop(context),
+                            onPressed: () {
+                              setState(() {
+                                liked = !liked;
+                              });
+                              setStateModal(() {}); // 모달 setState도 동기화
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.close_fullscreen,
+                              color: Colors.black,
                             ),
-                          ],
-                        ),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ],
                       ),
                     ),
                   ],

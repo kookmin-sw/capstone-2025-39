@@ -115,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Provider.of<AuthProvider>(context).isLoggedIn; // 로그인 상태 확인
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(),
+      appBar: AppBar(backgroundColor: Colors.white),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),

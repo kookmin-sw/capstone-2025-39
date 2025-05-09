@@ -171,7 +171,7 @@ class MyPageScreen extends StatelessWidget {
           if (index == 0) {
             Navigator.pushReplacementNamed(context, '/home');
           } else if (index == 1) {
-            Navigator.pushReplacementNamed(context, '/chat');
+            Navigator.pushReplacementNamed(context, '/history');
           }
         },
       ),

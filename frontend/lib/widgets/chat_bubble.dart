@@ -23,7 +23,7 @@ class ChatBubble extends StatelessWidget {
     final Color userTextColor = Colors.white;
 
     final Color botBgColor = const Color(0xFFF5F5F5);
-    final Color botTextColor = Colors.black;
+    final Color botTextColor = Color(0xFF3F454D);
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -36,7 +36,11 @@ class ChatBubble extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 4.0),
               child: Text(
                 time!,
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
+                style: const TextStyle(
+                  color: Color(0xFF3F454D),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
 

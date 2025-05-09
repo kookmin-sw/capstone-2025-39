@@ -23,10 +23,10 @@
       resolved="org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22"/>
   <library
       name=":@@:flutter_plugin_android_lifecycle::release"
-      jars="C:\Users\yohee\.gradle\caches\8.10.2\transforms\433aa327c82cab945e34ee93bb9c1c0e\transformed\out\jars\classes.jar;C:\Users\yohee\.gradle\caches\8.10.2\transforms\433aa327c82cab945e34ee93bb9c1c0e\transformed\out\jars\libs\R.jar"
+      jars="C:\Users\yohee\.gradle\caches\8.10.2\transforms\3f3cdf64b87b529feac2fae740f3624c\transformed\out\jars\classes.jar;C:\Users\yohee\.gradle\caches\8.10.2\transforms\3f3cdf64b87b529feac2fae740f3624c\transformed\out\jars\libs\R.jar"
       resolved="io.flutter.plugins.flutter_plugin_android_lifecycle:flutter_plugin_android_lifecycle:1.0"
-      partialResultsDir="C:\Users\yohee\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_plugin_android_lifecycle-2.0.27\android\build\intermediates\lint_vital_partial_results\release\lintVitalAnalyzeRelease\out"
-      folder="C:\Users\yohee\.gradle\caches\8.10.2\transforms\433aa327c82cab945e34ee93bb9c1c0e\transformed\out"
+      partialResultsDir="C:\Users\yohee\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_plugin_android_lifecycle-2.0.28\android\build\intermediates\lint_vital_partial_results\release\lintVitalAnalyzeRelease\out"
+      folder="C:\Users\yohee\.gradle\caches\8.10.2\transforms\3f3cdf64b87b529feac2fae740f3624c\transformed\out"
       manifest="AndroidManifest.xml"
       resFolder="res"
       assetsFolder="assets"
