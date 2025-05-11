@@ -53,9 +53,10 @@ class ChatBotService {
         print("-> 챗봇 응답(디코드): $data");
 
         if (lat is num && lng is num) {
+          // reply["stores"] 는 가게 이름  37.605943, 127.011035
           return {'reply': reply, 'lat': lat, 'lng': lng};
         } else {
-          return {'reply': reply, 'lat': 37.610827, 'lng': 126.996350};
+          return {'reply': reply, 'lat': 37.605943, 'lng': 127.011035};
         }
       } else {
         return {'reply': "챗봇 응답 실패: 다시 시도해주세요 (${response.statusCode})"};

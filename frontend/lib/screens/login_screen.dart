@@ -206,7 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-
+                  SizedBox(width: 2),
                   // Apple Button
                   SizedBox(
                     width: 180,
@@ -242,7 +242,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () async {
                     final userId = emailController.text.trim();
                     final password = passwordController.text;
-
                     try {
                       final result = await AuthService.login(userId, password);
                       final token = result['accessToken'];

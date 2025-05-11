@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:frontend/services/secure_storage_service.dart';
+import 'package:frontend/providers/auth_provider.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {

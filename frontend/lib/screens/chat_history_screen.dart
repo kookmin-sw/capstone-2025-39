@@ -66,10 +66,11 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         previews = latestByRoom;
       });
     } else {
-      print('❌ 불러오기 실패: ${response.statusCode}');
+      print('불러오기 실패: ${response.statusCode}');
     }
   }
 
+  // 채팅방 삭제 메서드
   Future<bool> deleteRoom(int roomId) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -96,12 +97,15 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         'http://223.130.152.181:8080/api/chat/delete/$roomId',
       );
 
-      final res = await http.delete(
+      final response = await http.delete(
         url,
         headers: {'Authorization': 'Bearer ${auth.token}'},
       );
 
-      if (res.statusCode == 200) {
+      print("[DeleteRoom] -> 응답 상태 코드: ${response.statusCode}");
+      print("[DeleteRoom] -> 응답 본문: ${response.body}");
+
+      if (response.statusCode == 200) {
         setState(() {
           previews.remove(roomId);
         });
@@ -135,6 +139,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         children: [
           const SizedBox(height: 20),
           Expanded(
+            // LiswView.builder로 채팅방 목록을 표시
             child: ListView.builder(
               padding: EdgeInsets.zero,
               itemCount: sorted.length,
@@ -155,15 +160,27 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                   child: Dismissible(
                     key: ValueKey(msg.roomId),
                     direction: DismissDirection.endToStart,
-                    background: Container(
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 20),
-                      color: Colors.red,
-                      child: const Icon(Icons.delete, color: Colors.white),
+
+                    // 삭제 버튼 영역
+                    background: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Container(
+                        color: Colors.red,
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20),
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
                     ),
                     confirmDismiss: (_) => deleteRoom(msg.roomId),
+
+                    // 카드 영역
                     child: InkWell(
-                      borderRadius: BorderRadius.circular(15),
+                      // borderRadius: const BorderRadius.only(
+                      //   topLeft: Radius.circular(15),
+                      //   topRight: Radius.circular(0),
+                      //   bottomLeft: Radius.circular(15),
+                      //   bottomRight: Radius.circular(0),
+                      // ),
                       onTap:
                           () => Navigator.push(
                             context,
