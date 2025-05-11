@@ -56,7 +56,7 @@ class _ChatMapState extends State<ChatMap> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: 320,
+          width: 280,
           height: 210,
           child: GoogleMap(
             initialCameraPosition: initialCamera,
@@ -73,6 +73,7 @@ class _ChatMapState extends State<ChatMap> {
               icon: Icon(
                 liked ? Icons.favorite : Icons.favorite_border,
                 color: Colors.red,
+                size: 24,
               ),
               onPressed: () {
                 setState(() {
@@ -81,7 +82,7 @@ class _ChatMapState extends State<ChatMap> {
               },
             ),
             IconButton(
-              icon: const Icon(Icons.fullscreen, color: Colors.black),
+              icon: Icon(Icons.fullscreen, color: Colors.black, size: 24),
               onPressed: () {
                 _showExpandedMap(context);
               },
@@ -174,6 +175,7 @@ class _ChatMapState extends State<ChatMap> {
                             icon: Icon(
                               liked ? Icons.favorite : Icons.favorite_border,
                               color: Colors.red,
+                              size: 32,
                             ),
                             onPressed: () {
                               setState(() {
@@ -183,9 +185,11 @@ class _ChatMapState extends State<ChatMap> {
                             },
                           ),
                           IconButton(
-                            icon: const Icon(
-                              Icons.close_fullscreen,
+                            icon: Image.asset(
+                              'assets/icons/exit-fullscreen.png',
                               color: Colors.black,
+                              width: 28,
+                              height: 28,
                             ),
                             onPressed: () => Navigator.pop(context),
                           ),
