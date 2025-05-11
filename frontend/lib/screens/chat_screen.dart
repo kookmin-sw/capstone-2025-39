@@ -23,6 +23,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<ChatMessage> messages = [];
   final TextEditingController _controller = TextEditingController();
   final ChatBotService _chatBotService = ChatBotService();
+  bool _isLoading = false; // 로딩 상태 추가
+
   final String startDate = DateFormat(
     'yyyy.MM.dd EEEE',
     'ko',
@@ -35,39 +37,49 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _loadMessagesFromServer() async {
+    setState(() => _isLoading = true); //  로딩 시작
     final auth = context.read<AuthProvider>();
     final url = Uri.parse(
-      'http://223.130.152.181:8080/api/chat/history?roomId=${widget.roomId}',
+      'http://223.130.152.181:8080/api/chat/history/${widget.roomId}',
     );
 
-    final response = await http.get(
-      url,
-      headers: {'Authorization': 'Bearer ${auth.token}'},
-    );
+    try {
+      final response = await http.get(
+        url,
+        headers: {'Authorization': 'Bearer ${auth.token}'},
+      );
 
-    print("[loadMessages] Status: ${response.statusCode}");
-    print("[loadMessages] Body: ${utf8.decode(response.bodyBytes)}");
+      print("[loadMessages] Status: ${response.statusCode}");
+      print("[loadMessages] Body: ${utf8.decode(response.bodyBytes)}");
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      setState(() {
-        messages.clear();
-        messages.addAll(
-          data.map(
-            (m) => ChatMessage(
-              text: m['text'],
-              isUser: m['isUser'],
-              time: m['time'],
-              date: m['date'],
-              lat: m['lat'],
-              lng: m['lng'],
-              roomId: m['roomId'],
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        final decoded = utf8.decode(response.bodyBytes);
+        final List<dynamic> data = jsonDecode(decoded);
+        setState(() {
+          messages.clear();
+          messages.addAll(
+            data.map(
+              (m) => ChatMessage(
+                text: m['text'],
+                isUser: m['user'],
+                time: m['time'],
+                date: m['date'],
+                lat: m['lat'],
+                lng: m['lng'],
+                roomId: m['roomId'],
+              ),
             ),
-          ),
-        );
-      });
-    } else {
-      print(" Failed to load messages: ${response.statusCode}");
+          );
+        });
+      } else {
+        print("Failed to load messages: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("[loadMessages] 예외 발생: $e");
+    } finally {
+      if (mounted) setState(() => _isLoading = false); // set State -> 로딩 종료
     }
   }
 
@@ -135,22 +147,6 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> saveMessagesToServer() async {
     final auth = context.read<AuthProvider>();
     final url = Uri.parse('http://223.130.152.181:8080/api/chat/save');
-    print(
-      messages
-          .map(
-            (msg) => {
-              'text': msg.text,
-              'isUser': msg.isUser,
-              'time': msg.time,
-              'date': msg.date,
-              'lat': msg.lat,
-              'lng': msg.lng,
-              'roomId': msg.roomId,
-              'userId': auth.userId,
-            },
-          )
-          .toList(),
-    );
     final chatList =
         messages
             .map(
@@ -174,17 +170,17 @@ class _ChatScreenState extends State<ChatScreen> {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ${auth.token}',
         },
-        body: jsonEncode(chatList), // 🔁 배열 자체를 루트로 보냄
+        body: jsonEncode(chatList),
       );
 
-      print("💾 [SaveMessages] Status: ${response.statusCode}");
-      print("💾 [SaveMessages] Body: ${utf8.decode(response.bodyBytes)}");
+      print("[SaveMessages] Status: ${response.statusCode}");
+      print("[SaveMessages] Body: ${utf8.decode(response.bodyBytes)}");
 
       if (response.statusCode != 200) {
-        print("❌ [SaveMessages] 저장 실패");
+        print("[SaveMessages] 저장 실패");
       }
     } catch (e) {
-      print("❗ [SaveMessages] 예외 발생: $e");
+      print("[SaveMessages] 예외 발생: $e");
     }
   }
 
@@ -229,49 +225,53 @@ class _ChatScreenState extends State<ChatScreen> {
         body: SafeArea(
           child: Column(
             children: [
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 16,
-                  ),
-                  itemCount: messages.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return Column(
-                        children: [
-                          const Text(
-                            '새로운 채팅을 시작합니다',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF3F454D),
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            startDate,
-                            style: const TextStyle(
-                              color: Color(0xFF3F454D),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-                      );
-                    }
+              _isLoading
+                  ? const Expanded(
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                  : Expanded(
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 16,
+                      ),
+                      itemCount: messages.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == 0) {
+                          return Column(
+                            children: [
+                              const Text(
+                                '새로운 채팅을 시작합니다',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF3F454D),
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                startDate,
+                                style: const TextStyle(
+                                  color: Color(0xFF3F454D),
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                            ],
+                          );
+                        }
 
-                    final message = messages[index - 1];
-                    return ChatBubble(
-                      message: message.text,
-                      isUser: message.isUser,
-                      time: message.time,
-                      lat: message.lat,
-                      lng: message.lng,
-                    );
-                  },
-                ),
-              ),
+                        final message = messages[index - 1];
+                        return ChatBubble(
+                          message: message.text,
+                          isUser: message.isUser,
+                          time: message.time,
+                          lat: message.lat,
+                          lng: message.lng,
+                        );
+                      },
+                    ),
+                  ),
               ChatInputField(controller: _controller, onSend: sendMessage),
             ],
           ),
