@@ -24,21 +24,13 @@ public class ChatController {
     private final JwtTokenProvider jwtTokenProvider;
 
 
-<<<<<<< HEAD
-    @PostMapping("/ask") //채팅데이터 전송
-    public ResponseEntity<Map<String, String>> ask(
-            @RequestBody Map<String, String> requestBody
-    ) {
-        try {
-            String message = requestBody.get("message");
-=======
+
     @PostMapping("/ask")
     public ResponseEntity<Map<String, String>> ask(@RequestBody Map<String, String> requestBody) {
         try {
             String message = requestBody.get("text"); // ← 여기 수정됨
             System.out.println("🟢 수신한 사용자 메시지: " + message);
 
->>>>>>> master
             AnswerDto aiResponse = aiClientService.queryAiServer(message);
             return ResponseEntity.ok(Map.of("response", aiResponse.getAnswer()));
         } catch (Exception e) {

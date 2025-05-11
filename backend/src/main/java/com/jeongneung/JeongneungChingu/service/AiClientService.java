@@ -27,12 +27,10 @@ public class AiClientService {
             ResponseEntity<String> res = restTemplate.postForEntity(FLASK_API_URL, entity, String.class);
             String json = res.getBody();
 
-<<<<<<< HEAD
-=======
+
             System.out.println("🔥 AI 원시 응답 JSON: " + json);
             System.out.println("🔻 상태코드: " + res.getStatusCode());
 
->>>>>>> master
             ObjectMapper mapper = new ObjectMapper();
             AnswerDto dto = mapper.readValue(json, AnswerDto.class);
 

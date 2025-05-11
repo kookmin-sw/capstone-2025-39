@@ -5,6 +5,7 @@ import com.jeongneung.JeongneungChingu.domain.entity.ChatMessage;
 import com.jeongneung.JeongneungChingu.domain.entity.User;
 import com.jeongneung.JeongneungChingu.repository.ChatMessageRepository;
 import com.jeongneung.JeongneungChingu.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -41,24 +42,19 @@ public class ChatService {
         }
     }
 
+    @Transactional
     public void deleteRoomByUserAndRoomId(String email, int roomId) {
         User user = findUserByEmail(email);
         chatMessageRepository.deleteByUserAndRoomId(user, roomId);
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
     public List<ChatMessageDto> getAllMessagesForUser(String email) {
         User user = findUserByEmail(email);
         List<ChatMessage> allMessages = chatMessageRepository.findByUserOrderByIdAsc(user);
 
         return allMessages.stream()
-<<<<<<< HEAD
-=======
                 .filter(chat -> chat.getText() != null && !chat.getText().trim().isEmpty()) // 👈 텍스트 없는 메시지 제거
->>>>>>> master
+
                 .map(chat -> ChatMessageDto.builder()
                         .text(chat.getText())
                         .isUser(chat.isUser())
@@ -71,10 +67,6 @@ public class ChatService {
                 .toList();
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> master
     public List<ChatMessageDto> getMessagesForUserByRoomId(String email, int roomId) {
         User user = findUserByEmail(email);
         List<ChatMessage> messages = chatMessageRepository.findByUserAndRoomIdOrderByIdAsc(user, roomId);

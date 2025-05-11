@@ -1,9 +1,7 @@
 package com.jeongneung.JeongneungChingu.domain.entity;
 
-<<<<<<< HEAD
-=======
-import com.fasterxml.jackson.annotation.JsonProperty;
->>>>>>> master
+
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,11 +21,7 @@ public class ChatMessage {
     private User user;
 
     private String text;
-<<<<<<< HEAD
-=======
 
-
->>>>>>> master
     private boolean isUser;
 
     public boolean isUser() {      // ChatService가 호출할 메서드
