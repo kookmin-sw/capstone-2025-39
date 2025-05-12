@@ -15,13 +15,14 @@ class HomeScreen extends StatelessWidget {
         Provider.of<AuthProvider>(context).isLoggedIn; // 로그인 상태 확인
     return Scaffold(
       backgroundColor: const Color(0xFF5B7553), // 초록 배경
+      // 하단 네비게이션 바
       bottomNavigationBar: BottomNavBar(
         currentIndex: 0,
         onTap: (index) {
           if (index == 0) {
             // 홈
           } else if (index == 1) {
-            // TO DO: 채팅 기록 화면
+            // 채팅 기록 화면
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const ChatHistoryScreen()),

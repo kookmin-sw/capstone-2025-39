@@ -267,6 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+      // 하단 네비게이션 바
       bottomNavigationBar: BottomNavBar(
         currentIndex: 2,
         onTap: (index) {
@@ -275,9 +276,9 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.pushNamed(context, '/home');
           } else if (index == 1) {
             // TO DO: 채팅 기록 화면
-            Navigator.pushNamed(context, '/home');
+            Navigator.pushNamed(context, '/history');
           } else if (index == 2) {
-            // 내 계정 or 로그인 화면으로 이동
+            // 내 계정 or 로그인 화면으로 이동 (로그인 상태에 따라)
             if (isLoggedIn) {
               Navigator.pushNamed(context, '/mypage');
             } else {

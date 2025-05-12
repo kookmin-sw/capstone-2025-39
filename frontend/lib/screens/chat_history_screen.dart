@@ -237,6 +237,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
           ),
         ],
       ),
+      // 하단 네비게이션 바
       bottomNavigationBar: BottomNavBar(
         currentIndex: 1,
         onTap: (index) {

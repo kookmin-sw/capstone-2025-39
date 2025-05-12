@@ -165,6 +165,7 @@ class MyPageScreen extends StatelessWidget {
           ],
         ),
       ),
+      // 하단 네비게이션 바
       bottomNavigationBar: BottomNavBar(
         currentIndex: 2,
         onTap: (index) {
