@@ -1,0 +1,62 @@
+# General ignores
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+*.iml
+*.ipr
+*.iws
+
+# IDE related
+.idea/
+.atom/
+.svn/
+.swiftpm/
+migrate_working_dir/
+.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+**/build/
+
+# Android build outputs
+/android/app/debug/
+/android/app/profile/
+/android/app/release/
+frontend/android/app/build/
+frontend/android/.gradle/
+
+
+# Dangerous large files (prevent accidental commits)
+*.hprof
+frontend/android/java_pid*.hprof
+*.bin
+*.apk
+*.so
+*.dex
+*.pb
+*.dm
+*.keystream
+*.len
+*.values.at
+*.tab
+*.i
+*.snapshot_data
+kernel_blob.bin
+
+
+# Secret files (never commit)
+android/gradle.properties
+
+
+# Symbolication / Obfuscation files
+app.*.symbols
+app.*.map.json
