@@ -1,0 +1,7 @@
+langchain==0.3.24
+langchain-community==0.3.22
+langchain-openai==0.3.14
+langchain-text-splitters==0.3.8
+faiss-cpu==1.10.0
+dotenv==0.9.9
+flask==3.1.0
