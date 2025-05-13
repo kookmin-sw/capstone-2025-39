@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:dio/dio.dart';
 
 import 'package:frontend/models/chat_message.dart';
 import 'package:frontend/services/chatbot_service.dart';
@@ -23,7 +22,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<ChatMessage> messages = [];
   final TextEditingController _controller = TextEditingController();
   final ChatBotService _chatBotService = ChatBotService();
-  bool _isLoading = false; // 로딩 상태 추가
+  bool _isLoading = false;
+  late final Dio dio;
 
   final String startDate = DateFormat(
     'yyyy.MM.dd EEEE',
@@ -33,30 +33,28 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+    dio = Dio();
     _loadMessagesFromServer();
   }
 
   Future<void> _loadMessagesFromServer() async {
-    setState(() => _isLoading = true); //  로딩 시작
+    setState(() => _isLoading = true);
     final auth = context.read<AuthProvider>();
-    final url = Uri.parse(
-      'http://223.130.152.181:8080/api/chat/history/${widget.roomId}',
-    );
+    final url = 'http://223.130.152.181:8080/api/chat/history/${widget.roomId}';
 
     try {
-      final response = await http.get(
+      final response = await dio.get(
         url,
-        headers: {'Authorization': 'Bearer ${auth.token}'},
+        options: Options(headers: {'Authorization': 'Bearer ${auth.token}'}),
       );
 
       print("[loadMessages] Status: ${response.statusCode}");
-      print("[loadMessages] Body: ${utf8.decode(response.bodyBytes)}");
+      print("[loadMessages] Body: ${response.data}");
 
       if (!mounted) return;
 
       if (response.statusCode == 200) {
-        final decoded = utf8.decode(response.bodyBytes);
-        final List<dynamic> data = jsonDecode(decoded);
+        final List<dynamic> data = response.data;
         setState(() {
           messages.clear();
           messages.addAll(
@@ -79,7 +77,7 @@ class _ChatScreenState extends State<ChatScreen> {
     } catch (e) {
       print("[loadMessages] 예외 발생: $e");
     } finally {
-      if (mounted) setState(() => _isLoading = false); // set State -> 로딩 종료
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -146,7 +144,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> saveMessagesToServer() async {
     final auth = context.read<AuthProvider>();
-    final url = Uri.parse('http://223.130.152.181:8080/api/chat/save');
+    final url = 'http://223.130.152.181:8080/api/chat/save';
     final chatList =
         messages
             .map(
@@ -164,17 +162,19 @@ class _ChatScreenState extends State<ChatScreen> {
             .toList();
 
     try {
-      final response = await http.post(
+      final response = await dio.post(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${auth.token}',
-        },
-        body: jsonEncode(chatList),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ${auth.token}',
+          },
+        ),
+        data: chatList,
       );
 
       print("[SaveMessages] Status: ${response.statusCode}");
-      print("[SaveMessages] Body: ${utf8.decode(response.bodyBytes)}");
+      print("[SaveMessages] Body: ${response.data}");
 
       if (response.statusCode != 200) {
         print("[SaveMessages] 저장 실패");

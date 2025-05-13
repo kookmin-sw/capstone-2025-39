@@ -1,35 +1,35 @@
-import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:frontend/providers/auth_provider.dart';
-import 'package:http/http.dart' as http;
 
 class AuthService {
   static const String _baseUrl = 'http://223.130.152.181:8080/api/users';
+  static final Dio dio = Dio();
 
   static Future<Map<String, dynamic>> safePost(
-    Uri url,
+    String url,
     Map<String, dynamic> body,
   ) async {
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(body),
-    );
+    try {
+      final response = await dio.post(
+        url,
+        options: Options(headers: {'Content-Type': 'application/json'}),
+        data: body,
+      );
 
-    if (response.statusCode == 200) {
-      try {
-        // JSON 응답인지 확인
-        final contentType = response.headers['content-type'];
-        if (contentType != null && contentType.contains('application/json')) {
-          return jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        if (response.headers['content-type']?.any(
+              (e) => e.contains('application/json'),
+            ) ??
+            false) {
+          return response.data;
         } else {
-          // JSON 아님 → 단순 메시지를 JSON으로 감싸서 반환
-          return {'success': true, 'message': response.body};
+          return {'success': true, 'message': response.data.toString()};
         }
-      } catch (e) {
-        throw Exception('응답 파싱 오류: $e\n본문: ${response.body}');
+      } else {
+        throw Exception('서버 오류: ${response.statusCode}\n본문: ${response.data}');
       }
-    } else {
-      throw Exception('서버 오류: ${response.statusCode}\n본문: ${response.body}');
+    } catch (e) {
+      throw Exception('응답 파싱 오류: $e');
     }
   }
 
@@ -38,7 +38,7 @@ class AuthService {
     String email,
     String password,
   ) async {
-    final url = Uri.parse('$_baseUrl/login');
+    final url = '$_baseUrl/login';
     final response = await safePost(url, {
       'email': email,
       'password': password,
@@ -63,7 +63,7 @@ class AuthService {
     required String password,
     required String name,
   }) async {
-    final url = Uri.parse('$_baseUrl/signup');
+    final url = '$_baseUrl/signup';
     return await safePost(url, {
       'email': email,
       'password': password,
@@ -76,21 +76,25 @@ class AuthService {
     required String idToken,
     required String accessToken,
   }) async {
-    final url = Uri.parse('$_baseUrl/oauth');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'provider': 'google',
-        'idToken': idToken,
-        'accessToken': accessToken,
-      }),
-    );
+    final url = '$_baseUrl/oauth';
+    try {
+      final response = await dio.post(
+        url,
+        options: Options(headers: {'Content-Type': 'application/json'}),
+        data: {
+          'provider': 'google',
+          'idToken': idToken,
+          'accessToken': accessToken,
+        },
+      );
 
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('구글 로그인 실패: ${response.body}');
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        throw Exception('구글 로그인 실패: ${response.data}');
+      }
+    } catch (e) {
+      throw Exception('구글 로그인 예외: $e');
     }
   }
 }

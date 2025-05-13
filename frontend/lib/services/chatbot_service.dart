@@ -1,10 +1,9 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 
 class ChatBotService {
   final String springBootUrl = 'http://223.130.152.181:8080/api/chat/ask';
-  // final String springBootUrl = 'http://22.130.152.181:8080/api/chat/ask'; // 가짜
+  final Dio dio = Dio();
 
   Future<Map<String, dynamic>> getReply(
     String input, {
@@ -16,44 +15,41 @@ class ChatBotService {
     try {
       final now = DateTime.now();
 
-      // 요청 바디 구성
       Map<String, dynamic> requestBody = {
         "text": input,
         "time": DateFormat('HH:mm').format(now),
         "date": DateFormat('yyyy-MM-dd').format(now),
         "lat": lat ?? 0.0,
         "lng": lng ?? 0.0,
-        "roomId": roomId, // 전달받은 roomId 사용
+        "roomId": roomId,
       };
 
-      // 디버깅 로그
       print("-> 요청 URL: $springBootUrl");
       print("-> JWT 토큰: ${token ?? '없음'}");
-      print("-> 요청 바디: ${jsonEncode(requestBody)}\n");
+      print("-> 요청 바디: $requestBody\n");
 
-      // POST 요청
-      final response = await http.post(
-        Uri.parse(springBootUrl),
-        headers: {
-          "Content-Type": "application/json; charset=UTF-8",
-          if (token != null) "Authorization": "Bearer $token",
-        },
-        body: jsonEncode(requestBody),
+      final response = await dio.post(
+        springBootUrl,
+        data: requestBody,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            if (token != null) "Authorization": "Bearer $token",
+          },
+        ),
       );
 
       print("-> 응답 상태 코드: ${response.statusCode}");
-      print("-> 응답 본문: ${response.body}");
+      print("-> 응답 본문: ${response.data}");
 
       if (response.statusCode == 200) {
-        final decoded = utf8.decode(response.bodyBytes); // 한글 깨짐 방지
-        final data = jsonDecode(decoded);
+        final data = response.data;
         final reply = data['response'];
         final lat = data['lat'];
         final lng = data['lng'];
         print("-> 챗봇 응답(디코드): $data");
 
         if (lat is num && lng is num) {
-          // reply["stores"] 는 가게 이름  37.605943, 127.011035
           return {'reply': reply, 'lat': lat, 'lng': lng};
         } else {
           return {'reply': reply, 'lat': 37.605943, 'lng': 127.011035};

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:dio/dio.dart';
 
 import 'package:frontend/models/chat_message.dart';
 import 'chat_screen.dart';
@@ -17,56 +16,58 @@ class ChatHistoryScreen extends StatefulWidget {
 
 class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
   Map<int, ChatMessage> previews = {};
+  late final Dio dio;
 
   @override
   void initState() {
     super.initState();
+    dio = Dio();
     _loadPreviewsFromServer();
   }
 
   // 전체 채팅 기록을 서버에서 가져오는 메서드
   Future<void> _loadPreviewsFromServer() async {
     final auth = context.read<AuthProvider>();
-    final url = Uri.parse('http://223.130.152.181:8080/api/chat/rooms');
+    final url = 'http://223.130.152.181:8080/api/chat/rooms';
 
-    final response = await http.get(
-      url,
-      headers: {'Authorization': 'Bearer ${auth.token}'},
-    );
+    try {
+      final response = await dio.get(
+        url,
+        options: Options(headers: {'Authorization': 'Bearer ${auth.token}'}),
+      );
 
-    print("[HistoryLoad] -> 응답 상태 코드: ${response.statusCode}");
-    print("[HistoryLoad] -> 응답 본문: ${response.body}");
+      print("[HistoryLoad] -> 응답 상태 코드: ${response.statusCode}");
+      print("[HistoryLoad] -> 응답 본문: ${response.data}");
 
-    if (response.statusCode == 200) {
-      final decoded = utf8.decode(response.bodyBytes); // 한글 깨짐 방지
-      final List<dynamic> data = jsonDecode(decoded); // 전체 메시지 배열
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
 
-      // roomId별 최신 메시지만 저장
-      Map<int, ChatMessage> latestByRoom = {};
+        // roomId별 최신 메시지만 저장
+        Map<int, ChatMessage> latestByRoom = {};
 
-      for (var item in data) {
-        final msg = ChatMessage(
-          text: item['text'],
-          isUser: item['user'],
-          time: item['time'],
-          date: item['date'],
-          lat: item['lat'],
-          lng: item['lng'],
-          roomId: item['roomId'],
-        );
+        for (var item in data) {
+          final msg = ChatMessage(
+            text: item['text'],
+            isUser: item['user'],
+            time: item['time'],
+            date: item['date'],
+            lat: item['lat'],
+            lng: item['lng'],
+            roomId: item['roomId'],
+          );
 
-        // 이미 있는 메시지보다 시간이 더 나중일 경우에만 갱신
-        if (!latestByRoom.containsKey(msg.roomId) ||
-            msg.time.compareTo(latestByRoom[msg.roomId]!.time) > 0) {
-          latestByRoom[msg.roomId] = msg;
+          if (!latestByRoom.containsKey(msg.roomId) ||
+              msg.time.compareTo(latestByRoom[msg.roomId]!.time) > 0) {
+            latestByRoom[msg.roomId] = msg;
+          }
         }
-      }
 
-      setState(() {
-        previews = latestByRoom;
-      });
-    } else {
-      print('불러오기 실패: ${response.statusCode}');
+        setState(() {
+          previews = latestByRoom;
+        });
+      }
+    } catch (e) {
+      print('불러오기 실패: $e');
     }
   }
 
@@ -93,23 +94,25 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
 
     if (confirmed ?? false) {
       final auth = context.read<AuthProvider>();
-      final url = Uri.parse(
-        'http://223.130.152.181:8080/api/chat/delete/$roomId',
-      );
+      final url = 'http://223.130.152.181:8080/api/chat/delete/$roomId';
 
-      final response = await http.delete(
-        url,
-        headers: {'Authorization': 'Bearer ${auth.token}'},
-      );
+      try {
+        final response = await dio.delete(
+          url,
+          options: Options(headers: {'Authorization': 'Bearer ${auth.token}'}),
+        );
 
-      print("[DeleteRoom] -> 응답 상태 코드: ${response.statusCode}");
-      print("[DeleteRoom] -> 응답 본문: ${response.body}");
+        print("[DeleteRoom] -> 응답 상태 코드: ${response.statusCode}");
+        print("[DeleteRoom] -> 응답 본문: ${response.data}");
 
-      if (response.statusCode == 200) {
-        setState(() {
-          previews.remove(roomId);
-        });
-        return true;
+        if (response.statusCode == 200) {
+          setState(() {
+            previews.remove(roomId);
+          });
+          return true;
+        }
+      } catch (e) {
+        print('삭제 실패: $e');
       }
     }
     return false;
@@ -139,7 +142,6 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         children: [
           const SizedBox(height: 20),
           Expanded(
-            // LiswView.builder로 채팅방 목록을 표시
             child: ListView.builder(
               padding: EdgeInsets.zero,
               itemCount: sorted.length,
@@ -160,8 +162,6 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                   child: Dismissible(
                     key: ValueKey(msg.roomId),
                     direction: DismissDirection.endToStart,
-
-                    // 삭제 버튼 영역
                     background: ClipRRect(
                       borderRadius: BorderRadius.circular(15),
                       child: Container(
@@ -172,15 +172,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                       ),
                     ),
                     confirmDismiss: (_) => deleteRoom(msg.roomId),
-
-                    // 카드 영역
                     child: InkWell(
-                      // borderRadius: const BorderRadius.only(
-                      //   topLeft: Radius.circular(15),
-                      //   topRight: Radius.circular(0),
-                      //   bottomLeft: Radius.circular(15),
-                      //   bottomRight: Radius.circular(0),
-                      // ),
                       onTap:
                           () => Navigator.push(
                             context,
@@ -237,7 +229,6 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
           ),
         ],
       ),
-      // 하단 네비게이션 바
       bottomNavigationBar: BottomNavBar(
         currentIndex: 1,
         onTap: (index) {
