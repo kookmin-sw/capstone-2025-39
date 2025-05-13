@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/chat_message.dart';
 import 'package:frontend/screens/chat_history_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -7,15 +6,9 @@ import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/screens/login_screen.dart';
 import 'package:frontend/screens/mypage_screen.dart';
 import 'package:frontend/providers/auth_provider.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-
-  Hive.registerAdapter(ChatMessageAdapter());
-  await Hive.openBox<ChatMessage>('chatBox');
-
   runApp(
     ChangeNotifierProvider<AuthProvider>(
       create: (_) => AuthProvider(),
