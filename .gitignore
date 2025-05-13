@@ -1,0 +1,7 @@
+// flutter root ignore
+.DS_Store
+.idea/
+*.iml
+*.apk
+frontend/android/java_pid*.hprof
+.vscode/

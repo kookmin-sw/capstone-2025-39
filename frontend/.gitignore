@@ -35,13 +35,10 @@ migrate_working_dir/
 **/build/
 
 # 대용량 빌드 파일 무시시
-*.hprof0
+*.hprof
+frontend/android/java_pid*.hprof 
 *.apk
 kernel_blob.bin
-
-# 키 정보 - 업로드 금지
-android/gradle.properties
-android/app/build/
 
 *.apk
 
