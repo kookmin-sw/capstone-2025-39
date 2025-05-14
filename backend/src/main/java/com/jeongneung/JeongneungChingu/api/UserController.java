@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
+import org.springframework.http.HttpStatus;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -34,5 +34,17 @@ public class UserController {
                 "accessToken", token,
                 "userId", user.getEmail()
         ));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid token");
+        }
+
+        String token = authHeader.substring(7); // "Bearer " 제거
+        String userId = jwtTokenProvider.getUserIdFromToken(token); // ✅ 이 메서드 사용!
+
+        return ResponseEntity.ok(Map.of("userId", userId));
     }
 }
