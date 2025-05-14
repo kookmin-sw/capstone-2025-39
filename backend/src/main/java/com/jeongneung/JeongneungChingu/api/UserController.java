@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import org.springframework.http.HttpStatus;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class UserController {
         return ResponseEntity.ok(result); //성공,실패 메시지 반환
     }
 
-    @PostMapping("/login")
+    @PostMapping("/login") //로그인 엔드포인트
     public ResponseEntity<?> login(@RequestBody UserDto.Login request) { //LoginRequest → UserDto.Login 사용
         User user = userService.validateLogin(request.getEmail(), request.getPassword());
 
@@ -34,5 +36,17 @@ public class UserController {
                 "accessToken", token,
                 "userId", user.getEmail()
         ));
+    }
+
+    @GetMapping("/me") //내 정보(이메일) 반환
+    public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing token");
+        }
+
+        String token = authHeader.substring(7);
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
+
+        return ResponseEntity.ok(Map.of("userId", userId));
     }
 }
