@@ -42,8 +42,8 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid token");
         }
 
-        String token = authHeader.substring(7); // "Bearer " 제거
-        String userId = jwtTokenProvider.getUserIdFromToken(token); // ✅ 이 메서드 사용!
+        String token = authHeader.substring(7);
+        String userId = jwtTokenProvider.getUserIdFromToken(token);
 
         return ResponseEntity.ok(Map.of("userId", userId));
     }
