@@ -98,6 +98,26 @@ class MyPageScreen extends StatelessWidget {
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {},
             ),
+            ListTile(
+              title: const Text(
+                '회원 탈퇴',
+                style: TextStyle(
+                  fontFamily: 'Pretendard',
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              onTap: () {
+                Provider.of<AuthProvider>(
+                  context,
+                  listen: false,
+                ).logOut(); // 로그아웃으로 상태 변경
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/login',
+                ); // 로그인 화면 돌아가기
+              },
+            ),
             const SizedBox(height: 18),
             // About
             const Padding(

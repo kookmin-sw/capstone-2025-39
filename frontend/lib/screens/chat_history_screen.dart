@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/load_chat.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 
 import 'package:frontend/models/chat_message.dart';
-import 'chat_screen.dart';
+import 'package:frontend/screens/chat_screen.dart';
 import 'package:frontend/widgets/bottom_nav.dart';
 import 'package:frontend/providers/auth_provider.dart';
 
@@ -177,7 +178,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                           () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => ChatScreen(roomId: msg.roomId),
+                              builder: (_) => LoadChat(roomId: msg.roomId),
                             ),
                           ),
                       child: Container(

@@ -10,16 +10,17 @@ import 'package:frontend/widgets/chat_input_field.dart';
 import 'package:frontend/services/location_service.dart';
 import 'package:frontend/providers/auth_provider.dart';
 
-class ChatScreen extends StatefulWidget {
+class LoadChat extends StatefulWidget {
   final int roomId;
-  const ChatScreen({super.key, required this.roomId});
+  const LoadChat({super.key, required this.roomId});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  State<LoadChat> createState() => _LoadChat();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
-  final List<ChatMessage> messages = []; // 전체 메시지
+class _LoadChat extends State<LoadChat> {
+  final List<ChatMessage> messages = [];
+  final List<ChatMessage> initialMessages = []; // 기존 메시지
   final TextEditingController _controller = TextEditingController();
   final ChatBotService _chatBotService = ChatBotService();
   bool _isLoading = false;
@@ -34,10 +35,11 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     dio = Dio();
-    _loadMessagesFromServer();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadMessagesFromServer();
+    });
   }
 
-  // 서버에서 지난 대화 기록 불러오기
   Future<void> _loadMessagesFromServer() async {
     setState(() => _isLoading = true);
     final auth = context.read<AuthProvider>();
@@ -53,21 +55,28 @@ class _ChatScreenState extends State<ChatScreen> {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
+        final loaded =
+            data
+                .map(
+                  (m) => ChatMessage(
+                    text: m['text'],
+                    isUser: m['user'],
+                    time: m['time'],
+                    date: m['date'],
+                    lat: m['lat'],
+                    lng: m['lng'],
+                    roomId: m['roomId'],
+                  ),
+                )
+                .toList();
+
         setState(() {
-          messages.clear();
-          messages.addAll(
-            data.map(
-              (m) => ChatMessage(
-                text: m['text'],
-                isUser: m['user'],
-                time: m['time'],
-                date: m['date'],
-                lat: m['lat'],
-                lng: m['lng'],
-                roomId: m['roomId'],
-              ),
-            ),
-          );
+          initialMessages
+            ..clear()
+            ..addAll(loaded);
+          messages
+            ..clear()
+            ..addAll(loaded);
         });
       }
     } catch (e) {
@@ -77,78 +86,18 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  // 사용자 메시지 + 챗봇 답변 보내기
-  Future<void> sendMessage(String text) async {
-    if (text.trim().isEmpty) return;
-
-    final formattedTime = DateFormat('a hh:mm', 'ko').format(DateTime.now());
-    final auth = context.read<AuthProvider>();
-    final token = auth.token;
-    final position = await getCurrentLocation();
-    final lat = position?.latitude;
-    final lng = position?.longitude;
-
-    setState(() {
-      messages.add(
-        ChatMessage(
-          text: text,
-          isUser: true,
-          time: formattedTime,
-          date: startDate,
-          roomId: widget.roomId,
-        ),
-      );
-    });
-
-    _controller.clear();
-
-    // 챗봇 응답 가져오기
-    final botReply = await _chatBotService.getReply(
-      text,
-      token: token,
-      lat: lat,
-      lng: lng,
-      roomId: widget.roomId,
-    );
-
-    final replyText = (botReply['reply'] as String?)?.trim() ?? '응답이 없습니다.';
-
-    setState(() {
-      // 챗봇 답변 추가
-      messages.add(
-        ChatMessage(
-          text: replyText,
-          isUser: false,
-          time: '',
-          date: startDate,
-          roomId: widget.roomId,
-        ),
-      );
-
-      // 위치 정보 포함 시 지도 메시지 추가
-      if (botReply['lat'] != null && botReply['lng'] != null) {
-        messages.add(
-          ChatMessage(
-            text: '',
-            isUser: false,
-            time: '',
-            date: startDate,
-            lat: botReply['lat'],
-            lng: botReply['lng'],
-            roomId: widget.roomId,
-          ),
-        );
-      }
-    });
-  }
-
-  // 전체 메시지 서버에 저장 (replace 방식)
   Future<void> saveMessagesToServer() async {
     final auth = context.read<AuthProvider>();
     final url = 'http://223.130.152.181:8080/api/chat/save';
 
+    // !! 추가된 메시지만 추출 !!
+    final newMessages =
+        messages.where((m) => !initialMessages.contains(m)).toList();
+
+    if (newMessages.isEmpty) return; // 추가 메시지가 없으면 요청 안 보냄
+
     final chatList =
-        messages
+        newMessages
             .map(
               (msg) => {
                 'text': msg.text,
@@ -175,7 +124,10 @@ class _ChatScreenState extends State<ChatScreen> {
         data: chatList,
       );
 
-      if (response.statusCode != 200) {
+      if (response.statusCode == 200) {
+        print("[SaveMessages] 추가 메시지 저장 완료");
+        initialMessages.addAll(newMessages); // 저장 성공 시 초기 메시지 업데이트
+      } else {
         print("[SaveMessages] 저장 실패");
       }
     } catch (e) {
@@ -183,11 +135,71 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  Future<void> sendMessage(String text) async {
+    if (text.trim().isEmpty) return;
+
+    final formattedTime = DateFormat('a hh:mm', 'ko').format(DateTime.now());
+    final auth = context.read<AuthProvider>();
+    final token = auth.token;
+    final position = await getCurrentLocation();
+    final lat = position?.latitude;
+    final lng = position?.longitude;
+
+    setState(() {
+      messages.add(
+        ChatMessage(
+          text: text,
+          isUser: true,
+          time: formattedTime,
+          date: startDate,
+          roomId: widget.roomId,
+        ),
+      );
+    });
+
+    _controller.clear();
+
+    final botReply = await _chatBotService.getReply(
+      text,
+      token: token,
+      lat: lat,
+      lng: lng,
+      roomId: widget.roomId,
+    );
+
+    final replyText = (botReply['reply'] as String?)?.trim() ?? '응답이 없습니다.';
+
+    setState(() {
+      messages.add(
+        ChatMessage(
+          text: replyText,
+          isUser: false,
+          time: '',
+          date: startDate,
+          roomId: widget.roomId,
+        ),
+      );
+
+      if (botReply['lat'] != null && botReply['lng'] != null) {
+        messages.add(
+          ChatMessage(
+            text: '',
+            isUser: false,
+            time: '',
+            date: startDate,
+            lat: botReply['lat'],
+            lng: botReply['lng'],
+            roomId: widget.roomId,
+          ),
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        // 뒤로가기 시 전체 메시지 서버에 저장
         await saveMessagesToServer();
         return true;
       },
@@ -201,7 +213,6 @@ class _ChatScreenState extends State<ChatScreen> {
           title: Stack(
             alignment: Alignment.center,
             children: [
-              // 타이틀
               const Text(
                 '정릉친구',
                 style: TextStyle(
@@ -210,14 +221,13 @@ class _ChatScreenState extends State<ChatScreen> {
                   color: Colors.black,
                 ),
               ),
-              // 뒤로가기 버튼
               Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.black),
                   onPressed: () async {
                     await saveMessagesToServer();
-                    Navigator.pop(context);
+                    Navigator.pop(context, true);
                   },
                 ),
               ),
@@ -227,7 +237,6 @@ class _ChatScreenState extends State<ChatScreen> {
         body: SafeArea(
           child: Column(
             children: [
-              // 로딩 중이면 로딩 표시
               _isLoading
                   ? const Expanded(
                     child: Center(child: CircularProgressIndicator()),
@@ -241,31 +250,31 @@ class _ChatScreenState extends State<ChatScreen> {
                       itemCount: messages.length + 1,
                       itemBuilder: (context, index) {
                         if (index == 0) {
-                          // 대화 시작 안내 + 날짜
-                          return Column(
-                            children: [
-                              const Text(
-                                '새로운 채팅을 시작합니다',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF3F454D),
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                startDate,
-                                style: const TextStyle(
-                                  color: Color(0xFF3F454D),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                            ],
-                          );
+                          return messages.isNotEmpty
+                              ? Column(
+                                children: [
+                                  const Text(
+                                    '과거 채팅을 시작합니다',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFF3F454D),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    messages[0].date,
+                                    style: const TextStyle(
+                                      color: Color(0xFF3F454D),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                ],
+                              )
+                              : const SizedBox.shrink();
                         }
 
-                        // 메시지 출력
                         final message = messages[index - 1];
                         return ChatBubble(
                           message: message.text,
@@ -277,7 +286,6 @@ class _ChatScreenState extends State<ChatScreen> {
                       },
                     ),
                   ),
-              // 입력창
               ChatInputField(controller: _controller, onSend: sendMessage),
             ],
           ),
