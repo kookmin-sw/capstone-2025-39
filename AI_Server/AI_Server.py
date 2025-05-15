@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 
 from utils import extract_weather_data
 
-# OpenAI API Key가 있는 .env 파일을 로드. 해당파일은 보안을 위해 깃헙으로 공유 X
+# OpenAI 및 기상청 API Key가 있는 .env 파일을 로드. 해당파일은 보안을 위해 깃헙으로 공유 X
 load_dotenv()
 KMA_API_KEY = os.getenv("KMA_API_KEY")
 
