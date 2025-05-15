@@ -181,7 +181,7 @@ class _ChatMapState extends State<ChatMap> {
   }
 }
 
-// ExpandedMapPage는 외부에 선언
+// ExpandedMapPage
 class ExpandedMapPage extends StatefulWidget {
   final double lat;
   final double lng;

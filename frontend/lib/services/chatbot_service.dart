@@ -45,20 +45,27 @@ class ChatBotService {
       if (response.statusCode == 200) {
         final data = response.data;
         final reply = data['response'];
-        final lat = data['lat'];
-        final lng = data['lng'];
+        final double? lat;
+        final double? lng;
+        lat = data['lat'];
+        lng = data['lng'];
+
         print("-> 챗봇 응답(디코드): $data");
 
-        if (lat is num && lng is num) {
+        if (lat != null && lng != null) {
           return {'reply': reply, 'lat': lat, 'lng': lng};
         } else {
-          return {'reply': reply, 'lat': 37.605943, 'lng': 127.011035};
+          return {'reply': reply};
         }
       } else {
         return {'reply': "챗봇 응답 실패: 다시 시도해주세요 (${response.statusCode})"};
       }
+    } on DioException catch (dioError) {
+      print("[Dio 예외 발생] ${dioError.message}");
+      return {'reply': "네트워크 오류 또는 서버 오류: ${dioError.message}"};
     } catch (e) {
-      return {'reply': "요청 실패: $e", 'lat': 37.610827, 'lng': 126.996350};
+      print("[알 수 없는 예외] $e");
+      return {'reply': "알 수 없는 오류: $e"};
     }
   }
 }
