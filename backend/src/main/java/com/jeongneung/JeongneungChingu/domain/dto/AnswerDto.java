@@ -9,5 +9,8 @@ public class AnswerDto {
     @JsonProperty("response")
     private String answer;
 
-    private List<String> stores; // ← JSON 키가 그대로 'stores'일 경우 매핑됨
+    private List<String> stores;
+
+    @JsonProperty("store_name")
+    private String storeName;
 }

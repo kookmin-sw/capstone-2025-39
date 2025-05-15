@@ -11,9 +11,11 @@ import lombok.Setter;
 @Setter
 @Builder
 public class ChatMessageDto {
-    private String text;
-    private String time;
 
+    @JsonProperty("response")
+    private String text;
+
+    private String time;
     private boolean isUser;
     private String date;
     private Double lat;

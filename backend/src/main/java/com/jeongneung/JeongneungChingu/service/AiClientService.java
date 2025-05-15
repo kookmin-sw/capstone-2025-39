@@ -35,7 +35,7 @@ public class AiClientService {
             AnswerDto dto = mapper.readValue(json, AnswerDto.class);
 
             System.out.println("✅ AI 응답: " + dto.getAnswer());
-            System.out.println("✅ 추천 가게: " + dto.getStores());
+            System.out.println("✅ 추천 가게: " + dto.getStoreName());
 
             return dto;
 

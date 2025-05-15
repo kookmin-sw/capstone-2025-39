@@ -1,0 +1,19 @@
+﻿{
+    "lastBuildDate":  "Thu, 15 May 2025 21:26:56 +0900",
+    "total":  3,
+    "start":  1,
+    "display":  3,
+    "items":  [
+                  {
+                      "title":  "\u003cb\u003e몬스택버거\u003c/b\u003e",
+                      "link":  "",
+                      "category":  "음식점\u003e햄버거",
+                      "description":  "",
+                      "telephone":  "",
+                      "address":  "서울특별시 성북구 정릉동 284-12 1층",
+                      "roadAddress":  "서울특별시 성북구 보국문로 73 1층",
+                      "mapx":  "1270087997",
+                      "mapy":  "376108280"
+                  }
+              ]
+}

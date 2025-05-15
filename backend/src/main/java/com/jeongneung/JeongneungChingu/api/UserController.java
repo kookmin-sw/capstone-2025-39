@@ -43,8 +43,13 @@ public class UserController {
         }
 
         String token = authHeader.substring(7);
-        String userId = jwtTokenProvider.getUserIdFromToken(token);
+        String email = jwtTokenProvider.getUserIdFromToken(token); // 이메일을 토큰에서 추출
 
-        return ResponseEntity.ok(Map.of("userId", userId));
+        User user = userService.getUserByEmail(email); // 여기에서 이름 조회
+
+        return ResponseEntity.ok(Map.of(
+                "userId", user.getEmail(),
+                "name", user.getName()
+        ));
     }
 }
