@@ -182,29 +182,29 @@ agent_executor = AgentExecutor(
 )
 
 # Flask 앱 초기화
-# app = Flask(__name__)
+app = Flask(__name__)
 
-# @app.route('/chat', methods=['POST'])
-# def handle_chat():
-#     # 요청에서 JSON 데이터 추출
-#     data = request.get_json()
-#     user_input = data.get('message', '')
+@app.route('/chat', methods=['POST'])
+def handle_chat():
+    # 요청에서 JSON 데이터 추출
+    data = request.get_json()
+    user_input = data.get('message', '')
     
-#     # 에이전트 실행
-#     result = agent_executor.invoke({"input": user_input})
+    # 에이전트 실행
+    result = agent_executor.invoke({"input": user_input})
     
-#     print(f"받은 메시지: {user_input}\n")
-#     print(f"반환 결과: {result}")
+    print(f"받은 메시지: {user_input}\n")
+    print(f"반환 결과: {result}")
     
-#     response_text = result["output"]
+    response_text = result["output"]
     
-#     return jsonify({'response': response_text})
+    return jsonify({'response': response_text})
 
 if __name__ == '__main__':
     # 서버 실행 모드
-    # app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
     
     # 콘솔 테스트 모드
-    user_input = input("입력: ")
-    result = agent_executor.invoke({"input": user_input})
-    print(result) 
+    # user_input = input("입력: ")
+    # result = agent_executor.invoke({"input": user_input})
+    # print(result) 
