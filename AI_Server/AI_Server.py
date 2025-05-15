@@ -7,7 +7,7 @@ from langchain_community.vectorstores import FAISS
 from dotenv import load_dotenv
 from langchain.agents import tool
 from langchain_core.utils.function_calling import convert_to_openai_function
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import requests
 from langchain.agents.output_parsers import OpenAIFunctionsAgentOutputParser
 from langchain.agents import AgentExecutor
@@ -63,29 +63,54 @@ llm = ChatOpenAI(
 
 # 1. RAG를 위한 도구 정의
 @tool
-def search_local_knowledge(query: str) -> str:
+def search_local_knowledge(query: str) -> Dict[str, Any]:
     """정릉동의 맛집과 장소에 대한 정보를 검색합니다. 이 도구는 사용자가 정릉동의 특정 음식점, 카페, 
-    지역 명소 등에 대해 물어볼 때 사용합니다."""
+    지역 명소 등에 대해 물어볼 때 사용합니다.
+    이 도구는 답변과 함께 참조된 가게 이름을 반환할 수 있습니다."""
     retriever = vectorstore.as_retriever()
-    docs = retriever.get_relevant_documents(query)
-    if not docs:
-        return "해당 정보를 찾을 수 없습니다."
     
-    # RAG를 통한 응답 생성
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
         retriever=retriever,
         chain_type_kwargs={"prompt": rag_prompt},
-        return_source_documents=False
+        return_source_documents=True
     )
-    result = qa_chain.invoke(query)
-    return result["result"]
+    
+    chain_input = {"query": query}
+    result = qa_chain.invoke(chain_input)
+    
+    answer = result.get("result", "해당 정보를 찾을 수 없습니다.")
+    store_name: Optional[str] = None 
+    
+    source_documents = result.get("source_documents")
+    if source_documents and len(source_documents) > 0:
+        first_doc = source_documents[0]
+        # print(first_doc) # Removing the debug print
+        
+        # Try to extract store_name from page_content
+        page_content = getattr(first_doc, 'page_content', '')
+        if page_content:
+            lines = page_content.split('\n')
+            for line in lines:
+                if line.startswith("가게명:"):
+                    store_name = line.replace("가게명:", "").strip()
+                    break # Found store name, exit loop
+        
+        # Fallback to metadata if not found in page_content (optional, can be removed if not desired)
+        if not store_name:
+            store_name_candidate = first_doc.metadata.get('source')
+            if store_name_candidate and isinstance(store_name_candidate, str):
+                store_name = os.path.basename(store_name_candidate)
+                store_name = os.path.splitext(store_name)[0] # Remove extension
+        
+    return {"answer": answer, "store_name": store_name}
 
 # 2. 날씨 정보를 위한 도구 정의 (구현 필요)
 @tool
-def get_weather(query: str) -> str:
-    """정릉동의 초단기 예보 날씨 정보를 가져옵니다. 사용자가 날씨에 대해 물어볼 때 사용합니다."""
+def get_weather(query: str) -> Dict[str, Any]:
+    """정릉동의 초단기 예보 날씨 정보를 가져옵니다. 사용자가 날씨에 대해 물어볼 때 사용합니다.
+    이 도구는 'answer' 키에 날씨 정보 문자열을, 'store_name' 키에 None을 포함하는 사전을 반환합니다."""
     datetime_now = datetime.now()
     request_time = datetime_now - timedelta(hours=1) # 초단기 예보가 1시간 단위로 발표하기 때문에, 에러회피를 위해 1시간 전의 데이터를 가져옴
     date = request_time.strftime("%Y%m%d")
@@ -120,12 +145,14 @@ def get_weather(query: str) -> str:
             응답:"""
         )
     )
-    return chain.run(weather_data=weather_data, query=query, datetime_now=datetime_now)
+    answer = chain.run(weather_data=weather_data, query=query, datetime_now=datetime_now)
+    return {"answer": answer, "store_name": None}
 
 # 3. 일반적인 대화를 위한 도구 정의
 @tool
-def general_conversation(query: str) -> str:
-    """일반적인 대화, 인사, 감사 표현 등에 응답합니다. 사용자가 인사를 하거나 일상적인 대화를 할 때 사용합니다."""
+def general_conversation(query: str) -> Dict[str, Any]:
+    """일반적인 대화, 인사, 감사 표현 등에 응답합니다. 사용자가 인사를 하거나 일상적인 대화를 할 때 사용합니다.
+    이 도구는 'answer' 키에 대화 응답 문자열을, 'store_name' 키에 None을 포함하는 사전을 반환합니다."""
     chain = LLMChain(
         llm=llm,
         prompt=PromptTemplate(
@@ -138,7 +165,7 @@ def general_conversation(query: str) -> str:
         )
     )
     response = chain.run(query=query)
-    return response
+    return {"answer": response, "store_name": None}
 
 # 도구 목록 정의
 tools = [search_local_knowledge, get_weather, general_conversation]
@@ -189,22 +216,72 @@ def handle_chat():
     # 요청에서 JSON 데이터 추출
     data = request.get_json()
     user_input = data.get('message', '')
+
+    if not user_input:
+        return jsonify({'error': 'No message provided'}), 400
     
     # 에이전트 실행
-    result = agent_executor.invoke({"input": user_input})
+    agent_response = agent_executor.invoke({"input": user_input})
     
+    final_text_response = agent_response.get("output")
+    retrieved_store_name: Optional[str] = None
+
+    intermediate_steps = agent_response.get("intermediate_steps", [])
+    if intermediate_steps:
+        # The last intermediate step contains the action taken and the observation from the tool
+        _action, observation = intermediate_steps[-1]
+        if isinstance(observation, dict):
+            # All tools now return a dict with 'store_name'
+            retrieved_store_name = observation.get("store_name")
+            # final_text_response from agent_response.get("output") is preferred as the agent might format it.
+            # If output is None, we could potentially use observation.get("answer") as a fallback.
+            if final_text_response is None and isinstance(observation.get("answer"), str) :
+                 final_text_response = observation.get("answer")
+
     print(f"받은 메시지: {user_input}\n")
-    print(f"반환 결과: {result}")
     
-    response_text = result["output"]
+    response_data = {
+        'response': final_text_response,
+        'store_name': retrieved_store_name
+    }
     
-    return jsonify({'response': response_text})
+    print(f"반환될 JSON: {json.dumps(response_data, ensure_ascii=False, indent=2)}")
+    
+    return jsonify(response_data)
 
 if __name__ == '__main__':
-    # 서버 실행 모드
+    # 서버 실행 모드 (아래 주석 해제 시 Flask 서버로 실행)
     app.run(host='0.0.0.0', port=5000, debug=True)
-    
-    # 콘솔 테스트 모드
-    # user_input = input("입력: ")
-    # result = agent_executor.invoke({"input": user_input})
-    # print(result) 
+
+    # # 콘솔 테스트 모드
+    # while True:
+    #     try:
+    #         user_input = input("입력 (종료하려면 'exit' 입력): ")
+    #         if user_input.lower() == 'exit':
+    #             break
+    #         if not user_input:
+    #             continue
+
+    #         agent_response = agent_executor.invoke({"input": user_input})
+            
+    #         final_text_response = agent_response.get("output")
+    #         retrieved_store_name: Optional[str] = None
+
+    #         intermediate_steps = agent_response.get("intermediate_steps", [])
+    #         if intermediate_steps:
+    #             _action, observation = intermediate_steps[-1]
+    #             if isinstance(observation, dict):
+    #                 retrieved_store_name = observation.get("store_name")
+    #                 if final_text_response is None and isinstance(observation.get("answer"), str) :
+    #                     final_text_response = observation.get("answer")
+
+    #         output_data = {
+    #             "response": final_text_response,
+    #             "store_name": retrieved_store_name
+    #         }
+    #         print(f"응답: {json.dumps(output_data, ensure_ascii=False, indent=2)}")
+    #     except EOFError: # Ctrl+D or similar
+    #         break
+    #     except KeyboardInterrupt: # Ctrl+C
+    #         break
+    # print("콘솔 테스트 모드를 종료합니다.") 
