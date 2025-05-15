@@ -86,9 +86,8 @@ def search_local_knowledge(query: str) -> Dict[str, Any]:
     source_documents = result.get("source_documents")
     if source_documents and len(source_documents) > 0:
         first_doc = source_documents[0]
-        # print(first_doc) # Removing the debug print
         
-        # Try to extract store_name from page_content
+        # 참조한 문서에서 가게명 추출
         page_content = getattr(first_doc, 'page_content', '')
         if page_content:
             lines = page_content.split('\n')
@@ -97,7 +96,6 @@ def search_local_knowledge(query: str) -> Dict[str, Any]:
                     store_name = line.replace("가게명:", "").strip()
                     break # Found store name, exit loop
         
-        # Fallback to metadata if not found in page_content (optional, can be removed if not desired)
         if not store_name:
             store_name_candidate = first_doc.metadata.get('source')
             if store_name_candidate and isinstance(store_name_candidate, str):
@@ -226,15 +224,13 @@ def handle_chat():
     final_text_response = agent_response.get("output")
     retrieved_store_name: Optional[str] = None
 
+    # 가게명 받아오기, 혹은 null로 채우기
     intermediate_steps = agent_response.get("intermediate_steps", [])
     if intermediate_steps:
-        # The last intermediate step contains the action taken and the observation from the tool
         _action, observation = intermediate_steps[-1]
         if isinstance(observation, dict):
-            # All tools now return a dict with 'store_name'
             retrieved_store_name = observation.get("store_name")
-            # final_text_response from agent_response.get("output") is preferred as the agent might format it.
-            # If output is None, we could potentially use observation.get("answer") as a fallback.
+
             if final_text_response is None and isinstance(observation.get("answer"), str) :
                  final_text_response = observation.get("answer")
 
