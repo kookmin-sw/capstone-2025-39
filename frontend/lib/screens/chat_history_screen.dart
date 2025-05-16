@@ -49,7 +49,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         for (var item in data) {
           final msg = ChatMessage(
             text: item['text'],
-            isUser: item['user'],
+            isUser: item['isUSer'],
             time: item['time'],
             date: item['date'],
             lat: item['lat'],

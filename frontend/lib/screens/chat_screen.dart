@@ -59,7 +59,7 @@ class _ChatScreenState extends State<ChatScreen> {
             data.map(
               (m) => ChatMessage(
                 text: m['text'],
-                isUser: m['user'],
+                isUser: m['isUser'],
                 time: m['time'],
                 date: m['date'],
                 lat: m['lat'],
@@ -203,12 +203,14 @@ class _ChatScreenState extends State<ChatScreen> {
             'time': msg.time,
             'date': msg.date,
             'roomId': msg.roomId,
-            'lat': msg.lat,
-            'lng': msg.lng,
+            'userId': auth.userId,
           };
+          // lat, lng이 null인 경우 포함
+          if (msg.lat != null) map['lat'] = msg.lat;
+          if (msg.lng != null) map['lng'] = msg.lng;
           return map;
         }).toList();
-    print(chatList);
+
     try {
       final response = await dio.post(
         url,

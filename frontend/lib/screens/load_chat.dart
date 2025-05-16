@@ -60,7 +60,7 @@ class _LoadChat extends State<LoadChat> {
                 .map(
                   (m) => ChatMessage(
                     text: m['text'],
-                    isUser: m['user'],
+                    isUser: m['isUser'],
                     time: m['time'],
                     date: m['date'],
                     lat: m['lat'],

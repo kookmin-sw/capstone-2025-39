@@ -44,7 +44,7 @@ class ChatBotService {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        final reply = data['response'];
+        final reply = data['text'];
         final double? lat =
             (data['lat'] is num) ? (data['lat'] as num).toDouble() : null;
         final double? lng =
