@@ -19,8 +19,8 @@ class ChatBotService {
         "text": input,
         "time": DateFormat('HH:mm').format(now),
         "date": DateFormat('yyyy-MM-dd').format(now),
-        "lat": lat ?? 0.0,
-        "lng": lng ?? 0.0,
+        "lat": lat,
+        "lng": lng,
         "roomId": roomId,
       };
 
@@ -45,10 +45,10 @@ class ChatBotService {
       if (response.statusCode == 200) {
         final data = response.data;
         final reply = data['response'];
-        final double? lat;
-        final double? lng;
-        lat = data['lat'];
-        lng = data['lng'];
+        final double? lat =
+            (data['lat'] is num) ? (data['lat'] as num).toDouble() : null;
+        final double? lng =
+            (data['lng'] is num) ? (data['lng'] as num).toDouble() : null;
 
         print("-> 챗봇 응답(디코드): $data");
 

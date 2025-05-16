@@ -87,6 +87,32 @@ class _ChatScreenState extends State<ChatScreen> {
     final position = await getCurrentLocation();
     final lat = position?.latitude;
     final lng = position?.longitude;
+    // 로그인을 안 한 경우 대화 제한
+    if (token == null) {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Colors.black, width: 1), // 검정 테두리
+              ),
+              title: Text(
+                "로그인 필요",
+                style: TextStyle(color: Colors.black, fontSize: 16),
+              ),
+              content: Text("채팅을 사용하려면 먼저 로그인해주세요."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("확인"),
+                ),
+              ],
+            ),
+      );
+      return;
+    }
 
     setState(() {
       messages.add(
@@ -112,7 +138,28 @@ class _ChatScreenState extends State<ChatScreen> {
     );
 
     final replyText = (botReply['reply'] as String?)?.trim() ?? '응답이 없습니다.';
-
+    // 토큰 만료된 경우 처리
+    if (botReply['error'] == 'unauthorized') {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              title: Text("세션 만료"),
+              content: Text("로그인 세션이 만료되었습니다. 다시 로그인해주세요."),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // 로그인 화면으로 이동 (예: named route 사용)
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                  child: Text("확인"),
+                ),
+              ],
+            ),
+      );
+      return;
+    }
     setState(() {
       // 챗봇 답변 추가
       messages.add(
