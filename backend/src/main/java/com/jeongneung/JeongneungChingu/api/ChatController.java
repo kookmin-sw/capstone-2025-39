@@ -39,18 +39,26 @@ public class ChatController {
             // AI 응답 받기
             AnswerDto aiResponse = aiClientService.queryAiServer(message);
 
-            // 가게명 정제
+            // ✅ 가게명 null-safe 정제
             String rawStoreName = aiResponse.getStoreName();
-            String cleanedStoreName = rawStoreName.replaceFirst("^정릉동\\s*", "").trim();
+            String cleanedStoreName = (rawStoreName != null)
+                    ? rawStoreName.replaceFirst("^정릉동\\s*", "").trim()
+                    : "";
+
             String query = "정릉동 " + cleanedStoreName;
 
             System.out.println("📌 원본 가게명: " + rawStoreName);
             System.out.println("📌 정제된 가게명: " + cleanedStoreName);
             System.out.println("🔎 최종 검색 키워드: " + query);
 
-            // 🔁 지역 검색 API로 좌표 가져오기
-            Optional<double[]> coords = naverLocalSearchService.getCoordinatesFromLocalSearch(query);
-            coords.ifPresent(c -> System.out.println("📍 네이버 좌표: " + Arrays.toString(c)));
+            // 🔁 지역 검색 API로 좌표 가져오기 (추천 가게명이 있을 때만)
+            Optional<double[]> coords = Optional.empty();
+            if (!cleanedStoreName.isEmpty()) {
+                coords = naverLocalSearchService.getCoordinatesFromLocalSearch(query);
+                coords.ifPresent(c -> System.out.println("📍 네이버 좌표: " + Arrays.toString(c)));
+            } else {
+                System.out.println("⚠️ 추천 가게명이 없어 좌표 검색 생략됨");
+            }
 
             // 현재 날짜/시간
             String currentDate = LocalDate.now().toString();
@@ -79,6 +87,7 @@ public class ChatController {
                             .build());
         }
     }
+
 
 
     @PostMapping("/save")
