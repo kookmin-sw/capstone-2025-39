@@ -193,22 +193,23 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> saveMessagesToServer() async {
     final auth = context.read<AuthProvider>();
     final url = 'http://223.130.152.181:8080/api/chat/save';
+    print("saveMessagesToServer() 호출!!");
 
     final chatList =
-        messages
-            .map(
-              (msg) => {
-                'text': msg.text,
-                'isUser': msg.isUser,
-                'time': msg.time,
-                'date': msg.date,
-                'lat': msg.lat,
-                'lng': msg.lng,
-                'roomId': msg.roomId,
-                'userId': auth.userId,
-              },
-            )
-            .toList();
+        messages.map((msg) {
+          final map = {
+            'text': msg.text,
+            'isUser': msg.isUser,
+            'time': msg.time,
+            'date': msg.date,
+            'roomId': msg.roomId,
+            'userId': auth.userId,
+          };
+          // lat, lng이 null인 경우 포함
+          if (msg.lat != null) map['lat'] = msg.lat;
+          if (msg.lng != null) map['lng'] = msg.lng;
+          return map;
+        }).toList();
 
     try {
       final response = await dio.post(
@@ -222,11 +223,21 @@ class _ChatScreenState extends State<ChatScreen> {
         data: chatList,
       );
 
+      print("[SaveMessages] 응답 상태 코드: ${response.statusCode}");
+      print("[SaveMessages] 응답 본문: ${response.data}");
+
       if (response.statusCode != 200) {
         print("[SaveMessages] 저장 실패");
+      } else {
+        print("[SaveMessages] 저장 성공");
       }
     } catch (e) {
-      print("[SaveMessages] 예외 발생: $e");
+      if (e is DioException) {
+        print("[SaveMessages] DioError 발생: ${e.response?.statusCode}");
+        print("[SaveMessages] DioError 응답 본문: ${e.response?.data}");
+      } else {
+        print("[SaveMessages] 예외 발생: $e");
+      }
     }
   }
 
