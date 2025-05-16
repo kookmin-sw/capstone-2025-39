@@ -87,6 +87,32 @@ class _ChatScreenState extends State<ChatScreen> {
     final position = await getCurrentLocation();
     final lat = position?.latitude;
     final lng = position?.longitude;
+    // 로그인을 안 한 경우 대화 제한
+    if (token == null) {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Colors.black, width: 1), // 검정 테두리
+              ),
+              title: Text(
+                "로그인 필요",
+                style: TextStyle(color: Colors.black, fontSize: 16),
+              ),
+              content: Text("채팅을 사용하려면 먼저 로그인해주세요."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("확인"),
+                ),
+              ],
+            ),
+      );
+      return;
+    }
 
     setState(() {
       messages.add(
@@ -112,7 +138,28 @@ class _ChatScreenState extends State<ChatScreen> {
     );
 
     final replyText = (botReply['reply'] as String?)?.trim() ?? '응답이 없습니다.';
-
+    // 토큰 만료된 경우 처리
+    if (botReply['error'] == 'unauthorized') {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              title: Text("세션 만료"),
+              content: Text("로그인 세션이 만료되었습니다. 다시 로그인해주세요."),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // 로그인 화면으로 이동 (예: named route 사용)
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                  child: Text("확인"),
+                ),
+              ],
+            ),
+      );
+      return;
+    }
     setState(() {
       // 챗봇 답변 추가
       messages.add(
@@ -146,22 +193,23 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> saveMessagesToServer() async {
     final auth = context.read<AuthProvider>();
     final url = 'http://223.130.152.181:8080/api/chat/save';
+    print("saveMessagesToServer() 호출!!");
 
     final chatList =
-        messages
-            .map(
-              (msg) => {
-                'text': msg.text,
-                'isUser': msg.isUser,
-                'time': msg.time,
-                'date': msg.date,
-                'lat': msg.lat,
-                'lng': msg.lng,
-                'roomId': msg.roomId,
-                'userId': auth.userId,
-              },
-            )
-            .toList();
+        messages.map((msg) {
+          final map = {
+            'text': msg.text,
+            'isUser': msg.isUser,
+            'time': msg.time,
+            'date': msg.date,
+            'roomId': msg.roomId,
+            'userId': auth.userId,
+          };
+          // lat, lng이 null인 경우 포함
+          if (msg.lat != null) map['lat'] = msg.lat;
+          if (msg.lng != null) map['lng'] = msg.lng;
+          return map;
+        }).toList();
 
     try {
       final response = await dio.post(
@@ -175,11 +223,21 @@ class _ChatScreenState extends State<ChatScreen> {
         data: chatList,
       );
 
+      print("[SaveMessages] 응답 상태 코드: ${response.statusCode}");
+      print("[SaveMessages] 응답 본문: ${response.data}");
+
       if (response.statusCode != 200) {
         print("[SaveMessages] 저장 실패");
+      } else {
+        print("[SaveMessages] 저장 성공");
       }
     } catch (e) {
-      print("[SaveMessages] 예외 발생: $e");
+      if (e is DioException) {
+        print("[SaveMessages] DioError 발생: ${e.response?.statusCode}");
+        print("[SaveMessages] DioError 응답 본문: ${e.response?.data}");
+      } else {
+        print("[SaveMessages] 예외 발생: $e");
+      }
     }
   }
 

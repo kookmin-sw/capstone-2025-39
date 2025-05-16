@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/services/auth_service.dart';
 import 'package:frontend/widgets/info_text_field.dart';
@@ -50,8 +51,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
           barrierDismissible: false, // 팝업 바깥 터치해도 안 닫히게
           builder: (BuildContext context) {
             return Dialog(
+              backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
+                side: BorderSide(color: Colors.black, width: 1),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(24),

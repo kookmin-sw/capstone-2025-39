@@ -122,9 +122,13 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoggedIn = Provider.of<AuthProvider>(context).isLoggedIn;
+    // list 정렬 규칙 : date, time 합쳐서 내림차순 정렬
     final sorted =
-        previews.entries.toList()
-          ..sort((a, b) => b.value.time.compareTo(a.value.time));
+        previews.entries.toList()..sort((a, b) {
+          final aDateTime = DateTime.parse("${a.value.date} ${a.value.time}");
+          final bDateTime = DateTime.parse("${b.value.date} ${b.value.time}");
+          return bDateTime.compareTo(aDateTime);
+        });
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -146,6 +150,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
             child: ListView.builder(
               padding: EdgeInsets.zero,
               itemCount: sorted.length,
+              // item 정렬
               itemBuilder: (context, index) {
                 final msg = sorted[index].value;
                 final preview =

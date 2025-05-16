@@ -97,20 +97,19 @@ class _LoadChat extends State<LoadChat> {
     if (newMessages.isEmpty) return; // 추가 메시지가 없으면 요청 안 보냄
 
     final chatList =
-        newMessages
-            .map(
-              (msg) => {
-                'text': msg.text,
-                'isUser': msg.isUser,
-                'time': msg.time,
-                'date': msg.date,
-                'lat': msg.lat,
-                'lng': msg.lng,
-                'roomId': msg.roomId,
-                'userId': auth.userId,
-              },
-            )
-            .toList();
+        newMessages.map((msg) {
+          final map = {
+            'text': msg.text,
+            'isUser': msg.isUser,
+            'time': msg.time,
+            'date': msg.date,
+            'roomId': msg.roomId,
+            'userId': auth.userId,
+          };
+          if (msg.lat != null) map['lat'] = msg.lat;
+          if (msg.lng != null) map['lng'] = msg.lng;
+          return map;
+        }).toList();
 
     try {
       final response = await dio.post(

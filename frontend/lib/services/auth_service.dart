@@ -97,4 +97,31 @@ class AuthService {
       throw Exception('구글 로그인 예외: $e');
     }
   }
+
+  // 유저 데이터 받기
+  static Future<Map<String, dynamic>> getUserData() async {
+    final url = '$_baseUrl/me';
+    final token = await SecureStorageService().getToken();
+
+    if (token == null) {
+      throw Exception("토큰이 없습니다. 로그인 필요");
+    }
+
+    try {
+      final response = await dio.get(
+        url,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        throw Exception(
+          '유저 데이터 조회 실패: ${response.statusCode} ${response.data}',
+        );
+      }
+    } catch (e) {
+      throw Exception('유저 데이터 조회 예외: $e');
+    }
+  }
 }
