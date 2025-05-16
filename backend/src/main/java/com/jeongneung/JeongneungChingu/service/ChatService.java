@@ -28,7 +28,14 @@ public class ChatService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
 
+
         for (ChatMessageDto dto : messages) {
+            System.out.println("✅ 저장됨: " + dto.getText());
+            System.out.println("🧪 dto 전체: " + dto); // dto.toString() 없으면 로그에 null 나올 수 있음
+            System.out.println("➡ text: " + dto.getText());
+            System.out.println("➡ time: " + dto.getTime());
+            System.out.println("➡ date: " + dto.getDate());
+            System.out.println("➡ isUser: " + dto.isUser());
             chatMessageRepository.save(ChatMessage.builder()
                     .user(user)
                     .text(dto.getText())

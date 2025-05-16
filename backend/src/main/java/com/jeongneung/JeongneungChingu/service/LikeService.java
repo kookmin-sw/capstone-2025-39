@@ -44,4 +44,5 @@ public class LikeService {
 
         likeRepository.deleteByUserAndPlaceName(user, placeName);
     }
+
 }
