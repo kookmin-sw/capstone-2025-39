@@ -59,7 +59,7 @@ class _ChatScreenState extends State<ChatScreen> {
             data.map(
               (m) => ChatMessage(
                 text: m['text'],
-                isUser: m['user'],
+                isUser: m['isUser'],
                 time: m['time'],
                 date: m['date'],
                 lat: m['lat'],
