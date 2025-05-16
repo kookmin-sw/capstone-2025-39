@@ -17,7 +17,6 @@ public class ChatMessageDto {
     @JsonProperty("text")
     private String text;
 
-
     private String time;
 
 
@@ -31,5 +30,6 @@ public class ChatMessageDto {
 
     private int roomId;
 
+    @JsonProperty("isUser")
     private boolean isUser;
 }
