@@ -56,6 +56,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
             lng: item['lng'],
             roomId: item['roomId'],
           );
+          print(msg);
 
           if (!latestByRoom.containsKey(msg.roomId) ||
               msg.time.compareTo(latestByRoom[msg.roomId]!.time) > 0) {
