@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/screens/load_chat.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
-
+import 'package:intl/intl.dart';
 import 'package:frontend/models/chat_message.dart';
 import 'package:frontend/screens/chat_screen.dart';
 import 'package:frontend/widgets/bottom_nav.dart';
@@ -49,14 +49,14 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         for (var item in data) {
           final msg = ChatMessage(
             text: item['text'],
-            isUser: item['isUSer'],
+            isUser: item['isUser'],
             time: item['time'],
             date: item['date'],
             lat: item['lat'],
             lng: item['lng'],
             roomId: item['roomId'],
           );
-          print(msg);
+          print("!!!!!!!$msg");
 
           if (!latestByRoom.containsKey(msg.roomId) ||
               msg.time.compareTo(latestByRoom[msg.roomId]!.time) > 0) {
@@ -126,8 +126,9 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     // list 정렬 규칙 : date, time 합쳐서 내림차순 정렬
     final sorted =
         previews.entries.toList()..sort((a, b) {
-          final aDateTime = DateTime.parse("${a.value.date} ${a.value.time}");
-          final bDateTime = DateTime.parse("${b.value.date} ${b.value.time}");
+          final format = DateFormat('yyyy.MM.dd EEEE a hh:mm', 'ko');
+          final aDateTime = format.parse("${a.value.date} ${a.value.time}");
+          final bDateTime = format.parse("${b.value.date} ${b.value.time}");
           return bDateTime.compareTo(aDateTime);
         });
 
