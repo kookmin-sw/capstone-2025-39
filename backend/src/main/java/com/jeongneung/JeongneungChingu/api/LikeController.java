@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/likes")
 @RequiredArgsConstructor
@@ -40,4 +42,24 @@ public class LikeController {
         long count = likeService.countLikes(placeName);
         return ResponseEntity.ok(count);
     }
+
+    @GetMapping("/status")
+    public ResponseEntity<?> getLikeStatus(
+            @RequestHeader("Authorization") String token,
+            @RequestParam String placeName
+    ) {
+        String email = jwtTokenProvider.getUserIdFromToken(token.substring(7));
+
+        boolean likedByUser = likeService.isLikedByUser(email, placeName);
+        long likeCount = likeService.countLikes(placeName);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "placeName", placeName,
+                        "likedByUser", likedByUser,
+                        "likeCount", likeCount
+                )
+        );
+    }
+
 }

@@ -33,10 +33,6 @@ public class LikeService {
         likeRepository.save(like);
     }
 
-    public long countLikes(String placeName) {
-        return likeRepository.countByPlaceName(placeName);
-    }
-
     @Transactional
     public void unlike(String email, String placeName) {
         User user = userRepository.findByEmail(email)
@@ -45,4 +41,14 @@ public class LikeService {
         likeRepository.deleteByUserAndPlaceName(user, placeName);
     }
 
+    public long countLikes(String placeName) {
+        return likeRepository.countByPlaceName(placeName);
+    }
+
+    public boolean isLikedByUser(String email, String placeName) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다"));
+
+        return likeRepository.findByUserAndPlaceName(user, placeName).isPresent();
+    }
 }
