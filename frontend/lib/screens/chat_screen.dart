@@ -192,7 +192,7 @@ class _ChatScreenState extends State<ChatScreen> {
   // 전체 메시지 서버에 저장 (replace 방식)
   Future<void> saveMessagesToServer() async {
     final auth = context.read<AuthProvider>();
-    final url = 'http://223.130.152.181:8080/api/chat/save';
+    final url = 'http://15.165.95.8:8080/api/chat/save';
     print("saveMessagesToServer() 호출!!");
 
     final chatList =

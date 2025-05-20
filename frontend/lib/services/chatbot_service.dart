@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 
 class ChatBotService {
-  final String springBootUrl = 'http://223.130.152.181:8080/api/chat/ask';
+  final String springBootUrl = 'http://15.165.95.8:8080/api/chat/ask';
   final Dio dio = Dio();
 
   Future<Map<String, dynamic>> getReply(

@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:frontend/providers/auth_provider.dart';
 
 class AuthService {
-  static const String _baseUrl = 'http://223.130.152.181:8080/api/users';
+  static const String _baseUrl = 'http://15.165.95.8:8080/api/users';
   static final Dio dio = Dio();
 
   static Future<Map<String, dynamic>> safePost(
