@@ -74,25 +74,31 @@ git clone https://github.com/kookmin-sw/capstone-2025-39.git
 Client
 <div markdown="1">
 
-    cd src/client/ 
-    yarn install
-    yarn run dev
+    1. Clone 'frontend' repository
+    2. Create or update 'gradle.properties' to add your API key
+    # gradle.properties.example 참고
+    
+    3. flutter pub get
+    4. flutter run
+    5. flutter build apk –release
+
 
 </div>
 
 Main_server
 <div markdown="1">
     
-    cd src/server/
-    docker-compose up -d
+    cd backend
+    gradlew.bat build
+    gradlew.bat bootRun
 
 </div>
 
 AI_server
 <div markdown="1">
 
-    cd src/AI_server
-    docker-compose up -d
+    docker pull leebyeongin/flask-ai-server
+    docker run -d -p 8080:8080 —name flask-ai-server leebyeongin/flask-ai-server
 
 </div>
 
@@ -112,5 +118,6 @@ AI_server
 ![FAISS](https://img.shields.io/badge/FAISS-2E9AFE?style=for-the-badge&logoColor=white)
 
 ### 6. 시스템 구조도
-<img src="./docs/images/system-architecture.png" width="800"/>
+<img src="./docs/images/system-architecture2.png" width="800"/>
+
 
