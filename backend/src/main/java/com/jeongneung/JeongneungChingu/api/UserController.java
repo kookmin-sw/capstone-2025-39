@@ -12,6 +12,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 
 
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
@@ -48,5 +49,7 @@ public class UserController {
         String userId = jwtTokenProvider.getUserIdFromToken(token);
 
         return ResponseEntity.ok(Map.of("userId", userId));
+
+
     }
 }

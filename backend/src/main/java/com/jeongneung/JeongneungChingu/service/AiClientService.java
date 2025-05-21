@@ -9,7 +9,7 @@ import java.util.Map;
 @Service
 public class AiClientService {
     private final RestTemplate restTemplate;
-    private static final String FLASK_API_URL = "http://223.130.152.181:5000/chat";
+    private static final String FLASK_API_URL = "http://15.165.95.8:5000/chat";
 
     public AiClientService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -35,7 +35,7 @@ public class AiClientService {
             AnswerDto dto = mapper.readValue(json, AnswerDto.class);
 
             System.out.println("✅ AI 응답: " + dto.getAnswer());
-            System.out.println("✅ 추천 가게: " + dto.getStores());
+            System.out.println("✅ 추천 가게: " + dto.getStoreName());
 
             return dto;
 

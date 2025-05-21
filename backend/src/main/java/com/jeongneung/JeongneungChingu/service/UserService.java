@@ -32,6 +32,10 @@ public class UserService {
         return "회원가입 성공";
     }
 
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomAuthException("사용자를 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
+    }
     // JWT를 사용한 로그인 검증 로직
     public User validateLogin(String userId, String rawPassword) {
         User user = userRepository.findByEmail(userId)  //DB에서 유저ID를 찾고 없다면 메시지 반환

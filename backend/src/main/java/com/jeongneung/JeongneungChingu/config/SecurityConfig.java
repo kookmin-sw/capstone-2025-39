@@ -31,14 +31,17 @@ public class SecurityConfig {
                                 "/api/users/login",
                                 "/api/users/signup",
                                 "/api/chat",
-                                "/swagger-ui.html",            // ✅ 추가
+                                "/api/likes",
+                                "/api/likes/count",
+                                "/api/likes/**",
+                                "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**",
                                 "/api/weather",
-                                "/"                             // 기본 루트
+                                "/"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
