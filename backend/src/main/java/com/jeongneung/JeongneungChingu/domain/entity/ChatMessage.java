@@ -24,6 +24,8 @@ public class ChatMessage {
 
     private boolean isUser;
 
+    private String placeName;
+
     public boolean isUser() {      // ChatService가 호출할 메서드
         return isUser;
     }

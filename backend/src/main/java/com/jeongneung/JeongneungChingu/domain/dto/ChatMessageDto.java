@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.Column;
 import lombok.*;
 
 @Getter
@@ -30,6 +31,10 @@ public class ChatMessageDto {
 
     private int roomId;
 
+
     @JsonProperty("isUser")
     private boolean isUser;
+
+    @Column(name = "place_name")
+    private String placeName;
 }

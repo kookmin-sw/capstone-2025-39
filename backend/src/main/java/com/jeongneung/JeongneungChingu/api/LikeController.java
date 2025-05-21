@@ -24,6 +24,7 @@ public class LikeController {
     ) {
         String email = jwtTokenProvider.getUserIdFromToken(token.substring(7));
         likeService.like(email, request.getPlaceName());
+        System.out.println("🧩 좋아요 요청: " + request.getPlaceName());
         return ResponseEntity.ok("좋아요 등록 완료");
     }
 

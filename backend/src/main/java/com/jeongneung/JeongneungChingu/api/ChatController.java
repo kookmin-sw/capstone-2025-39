@@ -72,6 +72,7 @@ public class ChatController {
                     .roomId(roomId)
                     .lat(coords.map(c -> c[0]).orElse(null))
                     .lng(coords.map(c -> c[1]).orElse(null))
+                    .placeName(cleanedStoreName)  // ⭐ 여기 추가
                     .build();
 
             System.out.println("✅ 최종 응답 DTO: " + new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(responseDto));

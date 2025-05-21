@@ -45,6 +45,7 @@ public class ChatService {
                     .lat(dto.getLat())
                     .lng(dto.getLng())
                     .roomId(dto.getRoomId())
+                    .placeName(dto.getPlaceName())  // 이 줄 추가!
                     .build());
         }
     }
