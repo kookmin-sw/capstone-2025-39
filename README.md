@@ -74,9 +74,14 @@ git clone https://github.com/kookmin-sw/capstone-2025-39.git
 Client
 <div markdown="1">
 
-    cd src/client/ 
-    yarn install
-    yarn run dev
+    1. Clone 'frontend' repository
+    2. Create or update 'gradle.properties' to add your API key
+    # gradle.properties.example 참고
+    
+    3. flutter pub get
+    4. flutter run
+    5. flutter build apk –release
+
 
 </div>
 
