@@ -83,16 +83,17 @@ Client
 Main_server
 <div markdown="1">
     
-    cd src/server/
-    docker-compose up -d
+    cd backend
+    gradlew.bat build
+    gradlew.bat bootRun
 
 </div>
 
 AI_server
 <div markdown="1">
 
-    cd src/AI_server
-    docker-compose up -d
+    docker pull leebyeongin/flask-ai-server
+    docker run -d -p 8080:8080 —name flask-ai-server leebyeongin/flask-ai-server
 
 </div>
 
