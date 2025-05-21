@@ -26,4 +26,4 @@ COPY . .
 EXPOSE 8080
 
 # 실행 명령어
-RUN uv run AI_Server.py
+RUN ["uv", "run", "AI_Server.py"]

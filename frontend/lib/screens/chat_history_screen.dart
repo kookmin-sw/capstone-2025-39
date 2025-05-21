@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/load_chat.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
-
+import 'package:intl/intl.dart';
 import 'package:frontend/models/chat_message.dart';
-import 'chat_screen.dart';
+import 'package:frontend/screens/chat_screen.dart';
 import 'package:frontend/widgets/bottom_nav.dart';
 import 'package:frontend/providers/auth_provider.dart';
 
@@ -48,13 +49,14 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
         for (var item in data) {
           final msg = ChatMessage(
             text: item['text'],
-            isUser: item['user'],
+            isUser: item['isUser'],
             time: item['time'],
             date: item['date'],
             lat: item['lat'],
             lng: item['lng'],
             roomId: item['roomId'],
           );
+          print("!!!!!!!$msg");
 
           if (!latestByRoom.containsKey(msg.roomId) ||
               msg.time.compareTo(latestByRoom[msg.roomId]!.time) > 0) {
@@ -121,9 +123,14 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoggedIn = Provider.of<AuthProvider>(context).isLoggedIn;
+    // list 정렬 규칙 : date, time 합쳐서 내림차순 정렬
     final sorted =
-        previews.entries.toList()
-          ..sort((a, b) => b.value.time.compareTo(a.value.time));
+        previews.entries.toList()..sort((a, b) {
+          final format = DateFormat('yyyy.MM.dd EEEE a hh:mm', 'ko');
+          final aDateTime = format.parse("${a.value.date} ${a.value.time}");
+          final bDateTime = format.parse("${b.value.date} ${b.value.time}");
+          return bDateTime.compareTo(aDateTime);
+        });
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -145,6 +152,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
             child: ListView.builder(
               padding: EdgeInsets.zero,
               itemCount: sorted.length,
+              // item 정렬
               itemBuilder: (context, index) {
                 final msg = sorted[index].value;
                 final preview =
@@ -177,7 +185,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                           () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => ChatScreen(roomId: msg.roomId),
+                              builder: (_) => LoadChat(roomId: msg.roomId),
                             ),
                           ),
                       child: Container(

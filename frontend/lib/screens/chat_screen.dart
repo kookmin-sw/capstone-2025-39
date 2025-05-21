@@ -19,7 +19,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final List<ChatMessage> messages = [];
+  final List<ChatMessage> messages = []; // 전체 메시지
   final TextEditingController _controller = TextEditingController();
   final ChatBotService _chatBotService = ChatBotService();
   bool _isLoading = false;
@@ -37,6 +37,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _loadMessagesFromServer();
   }
 
+  // 서버에서 지난 대화 기록 불러오기
   Future<void> _loadMessagesFromServer() async {
     setState(() => _isLoading = true);
     final auth = context.read<AuthProvider>();
@@ -48,9 +49,6 @@ class _ChatScreenState extends State<ChatScreen> {
         options: Options(headers: {'Authorization': 'Bearer ${auth.token}'}),
       );
 
-      print("[loadMessages] Status: ${response.statusCode}");
-      print("[loadMessages] Body: ${response.data}");
-
       if (!mounted) return;
 
       if (response.statusCode == 200) {
@@ -61,7 +59,7 @@ class _ChatScreenState extends State<ChatScreen> {
             data.map(
               (m) => ChatMessage(
                 text: m['text'],
-                isUser: m['user'],
+                isUser: m['isUser'],
                 time: m['time'],
                 date: m['date'],
                 lat: m['lat'],
@@ -71,8 +69,6 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           );
         });
-      } else {
-        print("Failed to load messages: ${response.statusCode}");
       }
     } catch (e) {
       print("[loadMessages] 예외 발생: $e");
@@ -81,6 +77,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  // 사용자 메시지 + 챗봇 답변 보내기
   Future<void> sendMessage(String text) async {
     if (text.trim().isEmpty) return;
 
@@ -90,6 +87,32 @@ class _ChatScreenState extends State<ChatScreen> {
     final position = await getCurrentLocation();
     final lat = position?.latitude;
     final lng = position?.longitude;
+    // 로그인을 안 한 경우 대화 제한
+    if (token == null) {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Colors.black, width: 1), // 검정 테두리
+              ),
+              title: Text(
+                "로그인 필요",
+                style: TextStyle(color: Colors.black, fontSize: 16),
+              ),
+              content: Text("채팅을 사용하려면 먼저 로그인해주세요."),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("확인"),
+                ),
+              ],
+            ),
+      );
+      return;
+    }
 
     setState(() {
       messages.add(
@@ -105,6 +128,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _controller.clear();
 
+    // 챗봇 응답 가져오기
     final botReply = await _chatBotService.getReply(
       text,
       token: token,
@@ -114,8 +138,30 @@ class _ChatScreenState extends State<ChatScreen> {
     );
 
     final replyText = (botReply['reply'] as String?)?.trim() ?? '응답이 없습니다.';
-
+    // 토큰 만료된 경우 처리
+    if (botReply['error'] == 'unauthorized') {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              title: Text("세션 만료"),
+              content: Text("로그인 세션이 만료되었습니다. 다시 로그인해주세요."),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // 로그인 화면으로 이동 (예: named route 사용)
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                  child: Text("확인"),
+                ),
+              ],
+            ),
+      );
+      return;
+    }
     setState(() {
+      // 챗봇 답변 추가
       messages.add(
         ChatMessage(
           text: replyText,
@@ -126,6 +172,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       );
 
+      // 위치 정보 포함 시 지도 메시지 추가
       if (botReply['lat'] != null && botReply['lng'] != null) {
         messages.add(
           ChatMessage(
@@ -142,24 +189,27 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  // 전체 메시지 서버에 저장 (replace 방식)
   Future<void> saveMessagesToServer() async {
     final auth = context.read<AuthProvider>();
     final url = 'http://223.130.152.181:8080/api/chat/save';
+    print("saveMessagesToServer() 호출!!");
+
     final chatList =
-        messages
-            .map(
-              (msg) => {
-                'text': msg.text,
-                'isUser': msg.isUser,
-                'time': msg.time,
-                'date': msg.date,
-                'lat': msg.lat,
-                'lng': msg.lng,
-                'roomId': msg.roomId,
-                'userId': auth.userId,
-              },
-            )
-            .toList();
+        messages.map((msg) {
+          final map = {
+            'text': msg.text,
+            'isUser': msg.isUser,
+            'time': msg.time,
+            'date': msg.date,
+            'roomId': msg.roomId,
+            'userId': auth.userId,
+          };
+          // lat, lng이 null인 경우 포함
+          if (msg.lat != null) map['lat'] = msg.lat;
+          if (msg.lng != null) map['lng'] = msg.lng;
+          return map;
+        }).toList();
 
     try {
       final response = await dio.post(
@@ -173,14 +223,21 @@ class _ChatScreenState extends State<ChatScreen> {
         data: chatList,
       );
 
-      print("[SaveMessages] Status: ${response.statusCode}");
-      print("[SaveMessages] Body: ${response.data}");
+      print("[SaveMessages] 응답 상태 코드: ${response.statusCode}");
+      print("[SaveMessages] 응답 본문: ${response.data}");
 
       if (response.statusCode != 200) {
         print("[SaveMessages] 저장 실패");
+      } else {
+        print("[SaveMessages] 저장 성공");
       }
     } catch (e) {
-      print("[SaveMessages] 예외 발생: $e");
+      if (e is DioException) {
+        print("[SaveMessages] DioError 발생: ${e.response?.statusCode}");
+        print("[SaveMessages] DioError 응답 본문: ${e.response?.data}");
+      } else {
+        print("[SaveMessages] 예외 발생: $e");
+      }
     }
   }
 
@@ -188,6 +245,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
+        // 뒤로가기 시 전체 메시지 서버에 저장
         await saveMessagesToServer();
         return true;
       },
@@ -201,6 +259,7 @@ class _ChatScreenState extends State<ChatScreen> {
           title: Stack(
             alignment: Alignment.center,
             children: [
+              // 타이틀
               const Text(
                 '정릉친구',
                 style: TextStyle(
@@ -209,6 +268,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   color: Colors.black,
                 ),
               ),
+              // 뒤로가기 버튼
               Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
@@ -225,6 +285,7 @@ class _ChatScreenState extends State<ChatScreen> {
         body: SafeArea(
           child: Column(
             children: [
+              // 로딩 중이면 로딩 표시
               _isLoading
                   ? const Expanded(
                     child: Center(child: CircularProgressIndicator()),
@@ -238,6 +299,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       itemCount: messages.length + 1,
                       itemBuilder: (context, index) {
                         if (index == 0) {
+                          // 대화 시작 안내 + 날짜
                           return Column(
                             children: [
                               const Text(
@@ -261,6 +323,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           );
                         }
 
+                        // 메시지 출력
                         final message = messages[index - 1];
                         return ChatBubble(
                           message: message.text,
@@ -272,6 +335,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       },
                     ),
                   ),
+              // 입력창
               ChatInputField(controller: _controller, onSend: sendMessage),
             ],
           ),

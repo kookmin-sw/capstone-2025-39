@@ -3,8 +3,21 @@ import '../widgets/bottom_nav.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 
-class MyPageScreen extends StatelessWidget {
+class MyPageScreen extends StatefulWidget {
   const MyPageScreen({super.key});
+  @override
+  State<MyPageScreen> createState() => _MyPageScreenState();
+}
+
+class _MyPageScreenState extends State<MyPageScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // MyPage 들어올 때 최신 유저 데이터 자동 로드
+    Future.microtask(
+      () => Provider.of<AuthProvider>(context, listen: false).getUserData(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,17 +49,19 @@ class MyPageScreen extends StatelessWidget {
                 radius: 30,
                 backgroundColor: Colors.black,
               ),
-              title: const Text(
-                '안녕하세요',
-                style: TextStyle(
+              // 유저 이름
+              title: Text(
+                Provider.of<AuthProvider>(context).name ?? '이름 없음',
+                style: const TextStyle(
                   fontFamily: 'Pretendard',
                   fontWeight: FontWeight.w800, // SemiBold
                   fontSize: 20,
                 ),
               ),
-              subtitle: const Text(
-                'hello@.com',
-                style: TextStyle(
+              // 유저 이메일
+              subtitle: Text(
+                Provider.of<AuthProvider>(context).userId ?? '아이디 없음',
+                style: const TextStyle(
                   fontFamily: 'Pretendard',
                   fontWeight: FontWeight.w400,
                 ),
@@ -97,6 +112,26 @@ class MyPageScreen extends StatelessWidget {
               ),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {},
+            ),
+            ListTile(
+              title: const Text(
+                '회원 탈퇴',
+                style: TextStyle(
+                  fontFamily: 'Pretendard',
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              onTap: () {
+                Provider.of<AuthProvider>(
+                  context,
+                  listen: false,
+                ).logOut(); // 로그아웃으로 상태 변경
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/login',
+                ); // 로그인 화면 돌아가기
+              },
             ),
             const SizedBox(height: 18),
             // About
