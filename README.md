@@ -22,7 +22,10 @@ AI 기술로 지역 경제의 가치를 재발견하고, 더 따뜻한 커뮤니
 
 ### 2. 소개 영상
 
-프로젝트 소개하는 영상을 추가하세요
+<video width="640" height="360" controls>
+  <source src="./docs/images/video.mp4" type="video/mp4">
+  브라우저가 video 태그를 지원하지 않습니다.
+</video>
 
 ### 3. 팀 소개
 
