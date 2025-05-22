@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter/gestures.dart'; // gestureRecognizers
-import 'package:flutter/foundation.dart'; //Factory
+import 'package:flutter/gestures.dart';
+import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
+import 'package:frontend/providers/auth_provider.dart';
+import 'package:frontend/providers/like_provider.dart';
+import 'package:frontend/services/like_service.dart';
 
 class ChatMap extends StatefulWidget {
   final double lat;
   final double lng;
   final double? userLat;
   final double? userLng;
+  final String placeName;
 
   const ChatMap({
     super.key,
     required this.lat,
     required this.lng,
+    required this.placeName,
     this.userLat,
     this.userLng,
   });
@@ -22,17 +28,41 @@ class ChatMap extends StatefulWidget {
 }
 
 class _ChatMapState extends State<ChatMap> {
-  bool liked = false;
+  late String token;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    token = 'Bearer ${Provider.of<AuthProvider>(context, listen: false).token}';
+    _loadLikeStatus();
+  }
+
+  Future<void> _loadLikeStatus() async {
+    final likeProvider = Provider.of<LikeProvider>(context, listen: false);
+    final result = await LikeService.fetchLikeStatus(widget.placeName, token);
+    likeProvider.setLike(widget.placeName, result);
+  }
+
+  Future<void> _toggleLike() async {
+    final likeProvider = Provider.of<LikeProvider>(context, listen: false);
+    final current = likeProvider.getLike(widget.placeName);
+    final toggled = !current;
+
+    final result = await LikeService.toggleLike(
+      placeName: widget.placeName,
+      token: token,
+      shouldLike: toggled,
+    );
+
+    if (mounted && result == toggled) {
+      likeProvider.setLike(widget.placeName, toggled);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final LatLng destination = LatLng(widget.lat, widget.lng);
     final Set<Marker> markers = _buildMarkers();
-
-    final CameraPosition initialCamera = CameraPosition(
-      target: destination,
-      zoom: 15,
-    );
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,56 +72,50 @@ class _ChatMapState extends State<ChatMap> {
           height: 210,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Container(
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+            child: GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: destination,
+                zoom: 15,
               ),
-              child: GoogleMap(
-                initialCameraPosition: initialCamera,
-                markers: markers,
-                myLocationEnabled: true,
-                myLocationButtonEnabled: true,
-                zoomControlsEnabled: true,
-                mapToolbarEnabled: true,
-                gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
-                  Factory<OneSequenceGestureRecognizer>(
-                    () => EagerGestureRecognizer(),
-                  ),
-                },
-              ),
+              markers: markers,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+              zoomControlsEnabled: true,
+              mapToolbarEnabled: true,
+              gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                Factory<OneSequenceGestureRecognizer>(
+                  () => EagerGestureRecognizer(),
+                ),
+              },
             ),
           ),
         ),
-        // 좋아요, 전체 보기 아이콘
         SizedBox(
-          height: 210, // 지도 높이와 동일하게 맞추는 핵심
+          height: 210,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.end, // 바닥에 붙임
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    liked = !liked;
-                  });
+              Consumer<LikeProvider>(
+                builder: (context, likeProvider, _) {
+                  final liked = likeProvider.getLike(widget.placeName);
+                  return IconButton(
+                    onPressed: _toggleLike,
+                    icon: Icon(
+                      liked ? Icons.favorite : Icons.favorite_border,
+                      color: Colors.red,
+                      size: 28,
+                    ),
+                  );
                 },
-                icon: Icon(
-                  liked ? Icons.favorite : Icons.favorite_border,
-                  color: Colors.red,
+              ),
+              const SizedBox(height: 3),
+              IconButton(
+                onPressed: _showExpandedMap,
+                icon: const Icon(
+                  Icons.fullscreen,
+                  color: Colors.black,
                   size: 28,
                 ),
-              ),
-              SizedBox(height: 3),
-              IconButton(
-                onPressed: () {
-                  _showExpandedMap(context);
-                },
-                icon: Icon(Icons.fullscreen, color: Colors.black, size: 28),
               ),
             ],
           ),
@@ -126,8 +150,7 @@ class _ChatMapState extends State<ChatMap> {
     return markers;
   }
 
-  // Map 전체 화면
-  void _showExpandedMap(BuildContext context) {
+  void _showExpandedMap() {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -137,58 +160,20 @@ class _ChatMapState extends State<ChatMap> {
               lng: widget.lng,
               userLat: widget.userLat,
               userLng: widget.userLng,
-              liked: liked,
-              onLikeToggle: () {
-                setState(() {
-                  liked = !liked;
-                });
-              },
+              placeName: widget.placeName,
             ),
-      ),
-    );
-  }
-
-  Widget _buildCircleIcon({
-    IconData? icon,
-    String? iconAsset,
-    required VoidCallback onTap,
-    Color color = Colors.black,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 50,
-        height: 50,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.15),
-              blurRadius: 6,
-              offset: Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Center(
-          child:
-              icon != null
-                  ? Icon(icon, color: color, size: 28)
-                  : Image.asset(iconAsset!, width: 24, height: 24),
-        ),
       ),
     );
   }
 }
 
-// ExpandedMapPage
-class ExpandedMapPage extends StatefulWidget {
+// 전체화면 !!!
+class ExpandedMapPage extends StatelessWidget {
   final double lat;
   final double lng;
   final double? userLat;
   final double? userLng;
-  final bool liked;
-  final VoidCallback onLikeToggle;
+  final String placeName;
 
   const ExpandedMapPage({
     super.key,
@@ -196,22 +181,8 @@ class ExpandedMapPage extends StatefulWidget {
     required this.lng,
     this.userLat,
     this.userLng,
-    required this.liked,
-    required this.onLikeToggle,
+    required this.placeName,
   });
-
-  @override
-  State<ExpandedMapPage> createState() => _ExpandedMapPageState();
-}
-
-class _ExpandedMapPageState extends State<ExpandedMapPage> {
-  late bool liked;
-
-  @override
-  void initState() {
-    super.initState();
-    liked = widget.liked;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -232,29 +203,29 @@ class _ExpandedMapPageState extends State<ExpandedMapPage> {
                 width: screenWidth,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
                       blurRadius: 10,
-                      offset: Offset(0, -4),
+                      offset: const Offset(0, -4),
                     ),
                   ],
                 ),
                 child: Column(
                   children: [
-                    // 상단 드래그 핸들
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[400],
-                          borderRadius: BorderRadius.circular(2),
-                        ),
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
+                    const SizedBox(height: 8),
                     Expanded(
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
@@ -262,7 +233,7 @@ class _ExpandedMapPageState extends State<ExpandedMapPage> {
                           padding: const EdgeInsets.all(8.0),
                           child: GoogleMap(
                             initialCameraPosition: CameraPosition(
-                              target: LatLng(widget.lat, widget.lng),
+                              target: LatLng(lat, lng),
                               zoom: 16,
                             ),
                             markers: _buildMarkers(),
@@ -280,34 +251,44 @@ class _ExpandedMapPageState extends State<ExpandedMapPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 70), // 하단 아이콘 공간
+                    const SizedBox(height: 70),
                   ],
                 ),
               ),
             ),
-            // 하단 오른쪽 플로팅 버튼
             Positioned(
               bottom: 16 + bottomPadding,
               right: 16,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildCircleIcon(
-                    icon: liked ? Icons.favorite : Icons.favorite_border,
-                    color: Colors.red,
-                    onTap: () {
-                      setState(() {
-                        liked = !liked;
-                      });
-                      widget.onLikeToggle();
-                    },
-                  ),
-                  SizedBox(width: 12),
-                  _buildCircleIcon(
-                    iconAsset: 'assets/icons/exit-fullscreen.png',
-                    onTap: () => Navigator.pop(context),
-                  ),
-                ],
+              child: Consumer<LikeProvider>(
+                builder: (context, likeProvider, _) {
+                  final liked = likeProvider.getLike(placeName);
+                  return Row(
+                    children: [
+                      _buildCircleIcon(
+                        icon: liked ? Icons.favorite : Icons.favorite_border,
+                        color: Colors.red,
+                        onTap: () async {
+                          final token =
+                              'Bearer ${Provider.of<AuthProvider>(context, listen: false).token}';
+                          final toggled = !liked;
+                          final result = await LikeService.toggleLike(
+                            placeName: placeName,
+                            token: token,
+                            shouldLike: toggled,
+                          );
+                          if (result == toggled) {
+                            likeProvider.setLike(placeName, toggled);
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 12),
+                      _buildCircleIcon(
+                        icon: Icons.fullscreen_exit,
+                        onTap: () => Navigator.pop(context),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ],
@@ -320,17 +301,17 @@ class _ExpandedMapPageState extends State<ExpandedMapPage> {
     final markers = <Marker>{
       Marker(
         markerId: const MarkerId('destination'),
-        position: LatLng(widget.lat, widget.lng),
+        position: LatLng(lat, lng),
         infoWindow: const InfoWindow(title: '추천 장소'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
       ),
     };
 
-    if (widget.userLat != null && widget.userLng != null) {
+    if (userLat != null && userLng != null) {
       markers.add(
         Marker(
           markerId: const MarkerId('user'),
-          position: LatLng(widget.userLat!, widget.userLng!),
+          position: LatLng(userLat!, userLng!),
           infoWindow: const InfoWindow(title: '내 위치'),
           icon: BitmapDescriptor.defaultMarkerWithHue(
             BitmapDescriptor.hueAzure,
@@ -343,8 +324,7 @@ class _ExpandedMapPageState extends State<ExpandedMapPage> {
   }
 
   Widget _buildCircleIcon({
-    IconData? icon,
-    String? iconAsset,
+    required IconData icon,
     required VoidCallback onTap,
     Color color = Colors.black,
   }) {
@@ -360,16 +340,11 @@ class _ExpandedMapPageState extends State<ExpandedMapPage> {
             BoxShadow(
               color: Colors.black.withOpacity(0.15),
               blurRadius: 6,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
-        child: Center(
-          child:
-              icon != null
-                  ? Icon(icon, color: color, size: 28)
-                  : Image.asset(iconAsset!, width: 24, height: 24),
-        ),
+        child: Center(child: Icon(icon, color: color, size: 28)),
       ),
     );
   }

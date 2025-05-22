@@ -4,7 +4,7 @@ import 'package:frontend/widgets/bottom_nav.dart';
 import 'package:frontend/screens/chat_screen.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:frontend/utils/getNextRoomId.dart';
-import 'package:frontend/screens/chat_history_screen.dart';
+import 'package:frontend/screens/history_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key}); // 로그인 상태 전달받음
@@ -25,7 +25,7 @@ class HomeScreen extends StatelessWidget {
             // 채팅 기록 화면
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const ChatHistoryScreen()),
+              MaterialPageRoute(builder: (_) => const HistoryScreen()),
             );
           } else if (index == 2) {
             // 내 계정 or 로그인 화면으로 이동

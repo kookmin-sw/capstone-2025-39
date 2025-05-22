@@ -49,11 +49,16 @@ class ChatBotService {
             (data['lat'] is num) ? (data['lat'] as num).toDouble() : null;
         final double? lng =
             (data['lng'] is num) ? (data['lng'] as num).toDouble() : null;
-
+        final String? placeName = data['placeName'];
         print("-> 챗봇 응답(디코드): $data");
 
         if (lat != null && lng != null) {
-          return {'reply': reply, 'lat': lat, 'lng': lng};
+          return {
+            'reply': reply,
+            'lat': lat,
+            'lng': lng,
+            'placeName': placeName,
+          };
         } else {
           return {'reply': reply};
         }
