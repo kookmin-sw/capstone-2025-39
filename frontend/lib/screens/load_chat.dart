@@ -66,6 +66,7 @@ class _LoadChat extends State<LoadChat> {
                     lat: m['lat'],
                     lng: m['lng'],
                     roomId: m['roomId'],
+                    placeName: m['placeName'],
                   ),
                 )
                 .toList();
@@ -108,6 +109,7 @@ class _LoadChat extends State<LoadChat> {
           };
           if (msg.lat != null) map['lat'] = msg.lat;
           if (msg.lng != null) map['lng'] = msg.lng;
+          map['placeName'] = msg.placeName;
           return map;
         }).toList();
 
@@ -281,6 +283,7 @@ class _LoadChat extends State<LoadChat> {
                           time: message.time,
                           lat: message.lat,
                           lng: message.lng,
+                          placeName: message.placeName,
                         );
                       },
                     ),

@@ -24,19 +24,18 @@ class LikeService {
   static Future<bool> toggleLike({
     required String placeName,
     required String token,
-    required bool shouldLike, // 좋아요를 등록하고 싶은지 여부
+    required bool shouldLike,
   }) async {
     try {
       if (!shouldLike) {
-        // 좋아요를 등록하고 싶지 않음 -> 좋아요 삭제
         final res = await _dio.delete(
           '$_baseUrl/api/likes?placeName=${Uri.encodeComponent(placeName)}',
           options: Options(headers: {'Authorization': token}),
         );
+        final success = res.statusCode == 200;
         print('[LikeService] 좋아요 삭제 응답: ${res.statusCode}, ${res.data}');
-        return false;
+        return success ? false : shouldLike;
       } else {
-        // 좋아요를 등록하고
         final res = await _dio.post(
           '$_baseUrl/api/likes',
           data: {'placeName': placeName},
@@ -47,12 +46,13 @@ class LikeService {
             },
           ),
         );
+        final success = res.statusCode == 200;
         print('[LikeService] 좋아요 등록 응답: ${res.statusCode}, ${res.data}');
-        return true;
+        return success ? true : !shouldLike;
       }
     } catch (e) {
       print('[LikeService] 좋아요 토글 실패: $e');
-      return shouldLike; // 실패 시 상태 유지
+      return shouldLike; // 실패 시 이전 상태 유지
     }
   }
 }
