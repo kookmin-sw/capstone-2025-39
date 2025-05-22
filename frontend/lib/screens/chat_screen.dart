@@ -41,7 +41,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _loadMessagesFromServer() async {
     setState(() => _isLoading = true);
     final auth = context.read<AuthProvider>();
-    final url = 'http://223.130.152.181:8080/api/chat/history/${widget.roomId}';
+    final url = 'http://15.165.95.8:8080/api/chat/history/${widget.roomId}';
 
     try {
       final response = await dio.get(
@@ -65,6 +65,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 lat: m['lat'],
                 lng: m['lng'],
                 roomId: m['roomId'],
+                placeName: m['placeName'],
               ),
             ),
           );
@@ -183,6 +184,7 @@ class _ChatScreenState extends State<ChatScreen> {
             lat: botReply['lat'],
             lng: botReply['lng'],
             roomId: widget.roomId,
+            placeName: botReply['placeName'],
           ),
         );
       }
@@ -192,7 +194,7 @@ class _ChatScreenState extends State<ChatScreen> {
   // 전체 메시지 서버에 저장 (replace 방식)
   Future<void> saveMessagesToServer() async {
     final auth = context.read<AuthProvider>();
-    final url = 'http://223.130.152.181:8080/api/chat/save';
+    final url = 'http://15.165.95.8:8080/api/chat/save';
     print("saveMessagesToServer() 호출!!");
 
     final chatList =
@@ -206,8 +208,11 @@ class _ChatScreenState extends State<ChatScreen> {
             'userId': auth.userId,
           };
           // lat, lng이 null인 경우 포함
-          if (msg.lat != null) map['lat'] = msg.lat;
-          if (msg.lng != null) map['lng'] = msg.lng;
+          if (msg.lat != null && msg.lng != null) {
+            map['lat'] = msg.lat;
+            map['lng'] = msg.lng;
+            map['placeName'] = msg.placeName;
+          }
           return map;
         }).toList();
 
@@ -331,6 +336,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           time: message.time,
                           lat: message.lat,
                           lng: message.lng,
+                          placeName: message.placeName,
                         );
                       },
                     ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/screens/chat_history_screen.dart';
+import 'package:frontend/providers/like_provider.dart';
+import 'package:frontend/screens/history_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontend/screens/home_screen.dart';
@@ -10,8 +11,11 @@ import 'package:frontend/providers/auth_provider.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
-    ChangeNotifierProvider<AuthProvider>(
-      create: (_) => AuthProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => LikeProvider()),
+      ],
       child: const App(),
     ),
   );
@@ -29,7 +33,7 @@ class App extends StatelessWidget {
         '/home': (context) => const HomeScreen(),
         '/mypage': (context) => const MyPageScreen(),
         '/login': (context) => const LoginScreen(),
-        '/history': (context) => const ChatHistoryScreen(),
+        '/history': (context) => const HistoryScreen(),
       },
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

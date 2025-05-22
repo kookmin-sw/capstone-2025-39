@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="frontend"
+        android:label="정릉친구"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
    

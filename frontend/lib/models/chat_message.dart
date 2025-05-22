@@ -10,6 +10,7 @@ class ChatMessage {
   final double? lat;
   final double? lng;
   final int roomId; //채팅방 ID int형으로
+  final String? placeName;
 
   ChatMessage({
     required this.text,
@@ -19,5 +20,6 @@ class ChatMessage {
     this.lat,
     this.lng,
     required this.roomId,
+    this.placeName,
   });
 }

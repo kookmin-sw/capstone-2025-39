@@ -43,7 +43,7 @@ class _LoadChat extends State<LoadChat> {
   Future<void> _loadMessagesFromServer() async {
     setState(() => _isLoading = true);
     final auth = context.read<AuthProvider>();
-    final url = 'http://223.130.152.181:8080/api/chat/history/${widget.roomId}';
+    final url = 'http://15.165.95.8:8080/api/chat/history/${widget.roomId}';
 
     try {
       final response = await dio.get(
@@ -88,7 +88,7 @@ class _LoadChat extends State<LoadChat> {
 
   Future<void> saveMessagesToServer() async {
     final auth = context.read<AuthProvider>();
-    final url = 'http://223.130.152.181:8080/api/chat/save';
+    final url = 'http://15.165.95.8:8080/api/chat/save';
 
     // !! 추가된 메시지만 추출 !!
     final newMessages =

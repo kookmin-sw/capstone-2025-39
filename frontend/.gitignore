@@ -27,6 +27,9 @@ migrate_working_dir/
 build/
 **/build/
 
+# env 파일
+.env
+
 # Android build outputs
 /android/app/debug/
 /android/app/profile/

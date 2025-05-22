@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 
 class ChatBotService {
-  final String springBootUrl = 'http://223.130.152.181:8080/api/chat/ask';
+  final String springBootUrl = 'http://15.165.95.8:8080/api/chat/ask';
   final Dio dio = Dio();
 
   Future<Map<String, dynamic>> getReply(
@@ -49,11 +49,16 @@ class ChatBotService {
             (data['lat'] is num) ? (data['lat'] as num).toDouble() : null;
         final double? lng =
             (data['lng'] is num) ? (data['lng'] as num).toDouble() : null;
-
+        final String? placeName = data['placeName'];
         print("-> 챗봇 응답(디코드): $data");
 
         if (lat != null && lng != null) {
-          return {'reply': reply, 'lat': lat, 'lng': lng};
+          return {
+            'reply': reply,
+            'lat': lat,
+            'lng': lng,
+            'placeName': placeName,
+          };
         } else {
           return {'reply': reply};
         }
