@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
+import 'dart:convert';
 
 import 'package:frontend/models/chat_message.dart';
 import 'package:frontend/services/chatbot_service.dart';
@@ -41,6 +42,8 @@ class _LoadChat extends State<LoadChat> {
   }
 
   Future<void> _loadMessagesFromServer() async {
+    // 과거 채팅!!
+    print("[LoadChat] ##########과거채팅 시작 !!############");
     setState(() => _isLoading = true);
     final auth = context.read<AuthProvider>();
     final url = 'http://15.165.95.8:8080/api/chat/history/${widget.roomId}';
@@ -107,11 +110,25 @@ class _LoadChat extends State<LoadChat> {
             'roomId': msg.roomId,
             'userId': auth.userId,
           };
-          if (msg.lat != null) map['lat'] = msg.lat;
-          if (msg.lng != null) map['lng'] = msg.lng;
-          map['placeName'] = msg.placeName;
+          if (msg.lat != null && msg.lng != null) {
+            // 디코딩을 해야 제대로 저장됨
+            final encoded = utf8.encode(msg.placeName!);
+            final decoded = utf8.decode(encoded);
+            // print('디코딩 테스트: $decoded');
+            map['lat'] = msg.lat;
+            map['lng'] = msg.lng;
+            map['placeName'] = decoded;
+          }
           return map;
         }).toList();
+    // 디버깅용: 실제 저장될 메시지들 출력
+    print("**[SaveMesages] 요청! 저장될 메시지 목록:");
+    for (final m in chatList) {
+      print(
+        "→ ${m['text']} /n placeName : ${m['placeName']} / lat : ${m['lat']}, lng : ${m['lng']}",
+      );
+    }
+    print("**");
 
     try {
       final response = await dio.post(
@@ -181,6 +198,8 @@ class _LoadChat extends State<LoadChat> {
         ),
       );
 
+      // 응답처리!
+      // 응답에 위치 정보 포함 시 지도 메시지 추가
       if (botReply['lat'] != null && botReply['lng'] != null) {
         messages.add(
           ChatMessage(
@@ -191,6 +210,7 @@ class _LoadChat extends State<LoadChat> {
             lat: botReply['lat'],
             lng: botReply['lng'],
             roomId: widget.roomId,
+            placeName: botReply['placeName'],
           ),
         );
       }

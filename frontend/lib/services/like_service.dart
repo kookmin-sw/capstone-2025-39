@@ -7,10 +7,17 @@ class LikeService {
   // 좋아요 상태 조회
   static Future<bool> fetchLikeStatus(String placeName, String token) async {
     try {
+      final encodedPlaceName = Uri.encodeComponent(placeName);
+      final url = '$_baseUrl/api/likes/status?placeName=$encodedPlaceName';
+      print('[LikeService] 상태 조회 요청 URL: $url');
+
       final res = await _dio.get(
-        '$_baseUrl/api/likes/status?placeName=${Uri.encodeComponent(placeName)}',
+        url,
         options: Options(headers: {'Authorization': token}),
       );
+
+      print('[LikeService] 상태 조회 응답: ${res.statusCode}, ${res.data}');
+
       if (res.statusCode == 200 && res.data is Map) {
         return res.data['likedByUser'] == true;
       }
@@ -26,19 +33,36 @@ class LikeService {
     required String token,
     required bool shouldLike,
   }) async {
+    final encodedPlaceName = Uri.encodeComponent(placeName);
+
     try {
       if (!shouldLike) {
+        // 좋아요 취소!!
+        final url = '$_baseUrl/api/likes?placeName=$encodedPlaceName';
+        print('[LikeService] 좋아요 삭제 요청');
+        print('→ placeName: $placeName');
+        print('→ shouldLike: $shouldLike');
+        print('→ 요청 URL: $url');
+
         final res = await _dio.delete(
-          '$_baseUrl/api/likes?placeName=${Uri.encodeComponent(placeName)}',
+          url,
           options: Options(headers: {'Authorization': token}),
         );
-        final success = res.statusCode == 200;
         print('[LikeService] 좋아요 삭제 응답: ${res.statusCode}, ${res.data}');
+        final success = res.statusCode == 200;
         return success ? false : shouldLike;
       } else {
+        // 좋아요 등록!!
+        final url = '$_baseUrl/api/likes';
+        final requestBody = {'placeName': placeName};
+        print('[LikeService] 좋아요 등록 요청');
+        print('→ placeName: $placeName');
+        print('→ shouldLike: $shouldLike');
+        print('→ 요청 바디: $requestBody');
+
         final res = await _dio.post(
-          '$_baseUrl/api/likes',
-          data: {'placeName': placeName},
+          url,
+          data: requestBody,
           options: Options(
             headers: {
               'Authorization': token,
@@ -46,8 +70,9 @@ class LikeService {
             },
           ),
         );
-        final success = res.statusCode == 200;
+
         print('[LikeService] 좋아요 등록 응답: ${res.statusCode}, ${res.data}');
+        final success = res.statusCode == 200;
         return success ? true : !shouldLike;
       }
     } catch (e) {

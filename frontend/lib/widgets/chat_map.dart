@@ -3,6 +3,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/foundation.dart';
 import 'package:frontend/services/like_service.dart';
+import 'package:frontend/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class ChatMap extends StatefulWidget {
   final double lat;
@@ -31,8 +33,7 @@ class _ChatMapState extends State<ChatMap> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    token =
-        'Bearer \${Provider.of<AuthProvider>(context, listen: false).token}';
+    token = 'Bearer ${Provider.of<AuthProvider>(context, listen: false).token}';
     _loadLikeStatus();
   }
 
@@ -162,6 +163,7 @@ class _ChatMapState extends State<ChatMap> {
   }
 }
 
+// 전체 화면 페이지!
 class ExpandedMapPage extends StatefulWidget {
   final double lat;
   final double lng;
@@ -197,7 +199,7 @@ class _ExpandedMapPageState extends State<ExpandedMapPage> {
     token = '';
     WidgetsBinding.instance.addPostFrameCallback((_) {
       token =
-          'Bearer \${Provider.of<AuthProvider>(context, listen: false).token}';
+          'Bearer ${Provider.of<AuthProvider>(context, listen: false).token}';
     });
   }
 
