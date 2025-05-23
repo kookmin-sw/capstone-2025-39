@@ -77,7 +77,7 @@ class ChatBubble extends StatelessWidget {
               child: ChatMap(
                 lat: lat!,
                 lng: lng!,
-                placeName: placeName ?? message, // placeName 추가
+                placeName: placeName ?? '', // placeName 추가
               ),
             ),
         ],

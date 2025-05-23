@@ -9,6 +9,7 @@ import 'package:frontend/widgets/chat_bubble.dart';
 import 'package:frontend/widgets/chat_input_field.dart';
 import 'package:frontend/services/location_service.dart';
 import 'package:frontend/providers/auth_provider.dart';
+import 'dart:convert';
 
 class ChatScreen extends StatefulWidget {
   final int roomId;
@@ -78,7 +79,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  // 사용자 메시지 + 챗봇 답변 보내기
+  // 사용자 메시지 + 챗봇 답변 받기
   Future<void> sendMessage(String text) async {
     if (text.trim().isEmpty) return;
 
@@ -129,7 +130,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _controller.clear();
 
-    // 챗봇 응답 가져오기
+    // 챗봇 응답 가져오기!! (응답 받기 위해 보낼 변수들)
     final botReply = await _chatBotService.getReply(
       text,
       token: token,
@@ -173,7 +174,8 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       );
 
-      // 위치 정보 포함 시 지도 메시지 추가
+      // 응답처리!
+      // 응답에 위치 정보 포함 시 지도 메시지 추가
       if (botReply['lat'] != null && botReply['lng'] != null) {
         messages.add(
           ChatMessage(
@@ -209,12 +211,25 @@ class _ChatScreenState extends State<ChatScreen> {
           };
           // lat, lng이 null인 경우 포함
           if (msg.lat != null && msg.lng != null) {
+            // 디코딩을 해야 제대로 저장됨됨
+            final encoded = utf8.encode(msg.placeName!);
+            final decoded = utf8.decode(encoded);
+            // print('디코딩 테스트: $decoded');
             map['lat'] = msg.lat;
             map['lng'] = msg.lng;
-            map['placeName'] = msg.placeName;
+            map['placeName'] = decoded;
           }
           return map;
         }).toList();
+
+    // 디버깅용: 실제 저장될 메시지들 출력
+    print("**[SaveMesages] 요청! 저장될 메시지 목록:");
+    for (final m in chatList) {
+      print(
+        "→ ${m['text']} /n placeName : ${m['placeName']} / lat : ${m['lat']}, lng : ${m['lng']}",
+      );
+    }
+    print("**");
 
     try {
       final response = await dio.post(
