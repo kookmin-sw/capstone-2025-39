@@ -26,6 +26,7 @@ class _LoadChat extends State<LoadChat> {
   final ChatBotService _chatBotService = ChatBotService();
   bool _isLoading = false;
   late final Dio dio;
+  late AuthProvider _auth; // context 접근 대신, auth 변수를 클래스 멤버로 추가하기
 
   final String startDate = DateFormat(
     'yyyy.MM.dd EEEE',
@@ -41,17 +42,22 @@ class _LoadChat extends State<LoadChat> {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _auth = context.read<AuthProvider>();
+  }
+
   Future<void> _loadMessagesFromServer() async {
     // 과거 채팅!!
     print("[LoadChat] ##########과거채팅 시작 !!############");
     setState(() => _isLoading = true);
-    final auth = context.read<AuthProvider>();
     final url = 'http://15.165.95.8:8080/api/chat/history/${widget.roomId}';
 
     try {
       final response = await dio.get(
         url,
-        options: Options(headers: {'Authorization': 'Bearer ${auth.token}'}),
+        options: Options(headers: {'Authorization': 'Bearer ${_auth.token}'}),
       );
 
       if (!mounted) return;
@@ -91,7 +97,6 @@ class _LoadChat extends State<LoadChat> {
   }
 
   Future<void> saveMessagesToServer() async {
-    final auth = context.read<AuthProvider>();
     final url = 'http://15.165.95.8:8080/api/chat/save';
 
     // !! 추가된 메시지만 추출 !!
@@ -108,7 +113,7 @@ class _LoadChat extends State<LoadChat> {
             'time': msg.time,
             'date': msg.date,
             'roomId': msg.roomId,
-            'userId': auth.userId,
+            'userId': _auth.userId,
           };
           if (msg.lat != null && msg.lng != null) {
             // 디코딩을 해야 제대로 저장됨
@@ -136,7 +141,7 @@ class _LoadChat extends State<LoadChat> {
         options: Options(
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ${auth.token}',
+            'Authorization': 'Bearer ${_auth.token}',
           },
         ),
         data: chatList,
@@ -157,8 +162,7 @@ class _LoadChat extends State<LoadChat> {
     if (text.trim().isEmpty) return;
 
     final formattedTime = DateFormat('a hh:mm', 'ko').format(DateTime.now());
-    final auth = context.read<AuthProvider>();
-    final token = auth.token;
+    final token = _auth.token;
     final position = await getCurrentLocation();
     final lat = position?.latitude;
     final lng = position?.longitude;
@@ -218,10 +222,18 @@ class _LoadChat extends State<LoadChat> {
   }
 
   @override
+  void dispose() {
+    // 어떤 경로든 화면 벗어나면 저장
+    saveMessagesToServer(); 
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        await saveMessagesToServer();
+        await saveMessagesToServer(); // 안전하게 저장
         return true;
       },
       child: Scaffold(
@@ -247,7 +259,7 @@ class _LoadChat extends State<LoadChat> {
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.black),
                   onPressed: () async {
-                    await saveMessagesToServer();
+                    // await saveMessagesToServer();
                     Navigator.pop(context, true);
                   },
                 ),
@@ -295,7 +307,7 @@ class _LoadChat extends State<LoadChat> {
                               )
                               : const SizedBox.shrink();
                         }
-
+      
                         final message = messages[index - 1];
                         return ChatBubble(
                           message: message.text,

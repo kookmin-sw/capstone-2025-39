@@ -25,6 +25,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final ChatBotService _chatBotService = ChatBotService();
   bool _isLoading = false;
   late final Dio dio;
+  late AuthProvider _auth; // context 접근 대신, auth 변수를 클래스 멤버로 추가하기
 
   final String startDate = DateFormat(
     'yyyy.MM.dd EEEE',
@@ -38,16 +39,22 @@ class _ChatScreenState extends State<ChatScreen> {
     _loadMessagesFromServer();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _auth = context.read<AuthProvider>(); // context 사용은 여기서 한 번만
+    _loadMessagesFromServer();
+  }
+
   // 서버에서 지난 대화 기록 불러오기
   Future<void> _loadMessagesFromServer() async {
     setState(() => _isLoading = true);
-    final auth = context.read<AuthProvider>();
     final url = 'http://15.165.95.8:8080/api/chat/history/${widget.roomId}';
 
     try {
       final response = await dio.get(
         url,
-        options: Options(headers: {'Authorization': 'Bearer ${auth.token}'}),
+        options: Options(headers: {'Authorization': 'Bearer ${_auth.token}'}),
       );
 
       if (!mounted) return;
@@ -84,8 +91,7 @@ class _ChatScreenState extends State<ChatScreen> {
     if (text.trim().isEmpty) return;
 
     final formattedTime = DateFormat('a hh:mm', 'ko').format(DateTime.now());
-    final auth = context.read<AuthProvider>();
-    final token = auth.token;
+    final token = _auth.token;
     final position = await getCurrentLocation();
     final lat = position?.latitude;
     final lng = position?.longitude;
@@ -195,7 +201,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // 전체 메시지 서버에 저장 (replace 방식)
   Future<void> saveMessagesToServer() async {
-    final auth = context.read<AuthProvider>();
     final url = 'http://15.165.95.8:8080/api/chat/save';
     print("saveMessagesToServer() 호출!!");
 
@@ -207,7 +212,7 @@ class _ChatScreenState extends State<ChatScreen> {
             'time': msg.time,
             'date': msg.date,
             'roomId': msg.roomId,
-            'userId': auth.userId,
+            'userId': _auth.userId,
           };
           // lat, lng이 null인 경우 포함
           if (msg.lat != null && msg.lng != null) {
@@ -237,7 +242,7 @@ class _ChatScreenState extends State<ChatScreen> {
         options: Options(
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ${auth.token}',
+            'Authorization': 'Bearer ${_auth.token}',
           },
         ),
         data: chatList,
@@ -262,11 +267,20 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
+  void dispose() {
+    saveMessagesToServer().catchError((e) {
+      print("dispose 중 저장 실패: $e");
+    });
+    _controller.dispose();
+    super.dispose();
+}
+
+
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        // 뒤로가기 시 전체 메시지 서버에 저장
-        await saveMessagesToServer();
+        await saveMessagesToServer(); // 안전하게 저장하기 위해서
         return true;
       },
       child: Scaffold(
@@ -294,7 +308,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.black),
                   onPressed: () async {
-                    await saveMessagesToServer();
+                    // await saveMessagesToServer();
                     Navigator.pop(context);
                   },
                 ),
@@ -342,7 +356,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             ],
                           );
                         }
-
+      
                         // 메시지 출력
                         final message = messages[index - 1];
                         return ChatBubble(

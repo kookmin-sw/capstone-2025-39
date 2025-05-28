@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 class LikeService {
   static final Dio _dio = Dio();
+  static Dio get dio => _dio;
   static const String _baseUrl = 'http://15.165.95.8:8080';
 
   // 좋아요 상태 조회
