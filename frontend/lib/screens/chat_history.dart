@@ -71,6 +71,7 @@ class _ChatHistoryState extends State<ChatHistory> {
       context: context,
       builder:
           (_) => AlertDialog(
+            backgroundColor: Colors.white,
             title: const Text('기록 삭제'),
             content: const Text('이 채팅 기록을 삭제하시겠습니까?'),
             actions: [
