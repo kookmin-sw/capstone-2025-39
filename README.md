@@ -1,5 +1,8 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/gFPznrUY)
-### 1. 프로잭트 소개
+
+[소개 페이지 바로가기](https://kookmin-sw.github.io/capstone-2025-39/)
+
+### 1. 프로젝트 소개
 
 내 손안의 지역 맞춤형 AI 도우미, 캡스톤디자인 39팀 정릉친구
 
@@ -20,12 +23,8 @@
 "동네의 작은 이야기가 세상에 빛을 발하는 날까지."
 AI 기술로 지역 경제의 가치를 재발견하고, 더 따뜻한 커뮤니티를 만들어갑니다.
 
-### 2. 소개 영상
 
-
-
-
-### 3. 팀 소개
+### 2. 팀 소개
 
 <div align='center'>
   
@@ -65,7 +64,7 @@ AI 기술로 지역 경제의 가치를 재발견하고, 더 따뜻한 커뮤니
 
 </div> 
 
-### 4. 사용법
+### 3. 사용법
 
 Common
 ```bash
@@ -103,7 +102,7 @@ AI_server
 
 </div>
 
-### 5. 기술스택
+### 4. 기술스택
 
 **Front-end**<br>
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
@@ -118,7 +117,7 @@ AI_server
 ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white) ![LangChain](https://img.shields.io/badge/LangChain-00B3EC?style=for-the-badge&logoColor=white)
 ![FAISS](https://img.shields.io/badge/FAISS-2E9AFE?style=for-the-badge&logoColor=white)
 
-### 6. 시스템 구조도
+### 5. 시스템 구조도
 <img src="./docs/images/system-architecture2.png" width="800"/>
 
 
