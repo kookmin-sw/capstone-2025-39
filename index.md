@@ -1,13 +1,12 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/gFPznrUY)
-### 1. 프로잭트 소개
-
+## 정릉친구
 내 손안의 지역 맞춤형 AI 도우미, 캡스톤디자인 39팀 정릉친구
 
-정릉친구는 RAG(Retrieval-Augmented Generation) 기술을 기반으로 제작된 지역 특화 AI 서비스입니다. 동네 음식점부터 소규모 문화 장소까지, 홍보가 어려운 소상공인들의 정보를 정확하고 세심하게 제공합니다. 사용자의 질문에 실시간으로 답변하며, 기존 검색 플랫폼에서 누락되기 쉬운 동네의 숨은 명소를 발굴해 연결합니다.
+정릉친구는 RAG(Retrieval-Augmented Generation) 기술을 기반으로 제작된 지역 특화 AI 서비스입니다.
+동네 음식점부터 소규모 문화 장소까지, 홍보가 어려운 소상공인들의 정보를 정확하고 세심하게 제공합니다.사용자의 질문에 실시간으로 답변하며, 기존 검색 플랫폼에서 누락되기 쉬운 동네의 숨은 명소를 발굴해 연결합니다.
 
 ![Image](./ex.png)
 
-주요 기능
+### 주요 기능
 
 - 맞춤형 추천: 위치·취향 기반 장소 추천
 
@@ -20,11 +19,17 @@
 "동네의 작은 이야기가 세상에 빛을 발하는 날까지."
 AI 기술로 지역 경제의 가치를 재발견하고, 더 따뜻한 커뮤니티를 만들어갑니다.
 
-### 2. 소개 영상
+### 프로젝트 소개
+<div style="display: flex; justify-content: center;">
+  <iframe 
+    src="https://drive.google.com/file/d/1mo7bSc_oGux6TzSkEsfnGshnSrv4D8S5/preview" 
+    width="90%" 
+    height="400" 
+    style="border: none;">
+  </iframe>
+</div>
 
-프로젝트 소개하는 영상을 추가하세요
-
-### 3. 팀 소개
+### 팀 소개
 
 <div align='center'>
   
@@ -64,7 +69,7 @@ AI 기술로 지역 경제의 가치를 재발견하고, 더 따뜻한 커뮤니
 
 </div> 
 
-### 4. 사용법
+### 사용법
 
 Common
 ```bash
@@ -102,22 +107,27 @@ AI_server
 
 </div>
 
-### 5. 기술스택
+### 기술스택
 
-**Front-end**<br>
+**Front-end**
+
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 
 
-**Back-end**<br> 
+**Back-end**
+
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
 ![EC2](https://img.shields.io/badge/AWS_EC2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white) ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) ![Selenium](https://img.shields.io/badge/Selenium-43B02A?style=for-the-badge&logoColor=white) ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 
 
-**AI**<br> 
+**AI**
+
 ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white) ![LangChain](https://img.shields.io/badge/LangChain-00B3EC?style=for-the-badge&logoColor=white)
 ![FAISS](https://img.shields.io/badge/FAISS-2E9AFE?style=for-the-badge&logoColor=white)
 
-### 6. 시스템 구조도
-<img src="./docs/images/system-architecture2.png" width="800"/>
+### 시스템 구조도
+<img src="./docs/images/system-architecture3.png" width="800"/>
 
+---
 
+![수행결과보고서](./docs/수행결과보고서-39조.pdf)
