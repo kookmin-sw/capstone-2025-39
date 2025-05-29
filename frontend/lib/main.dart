@@ -6,6 +6,7 @@ import 'package:frontend/screens/home_screen.dart';
 import 'package:frontend/screens/login_screen.dart';
 import 'package:frontend/screens/mypage_screen.dart';
 import 'package:frontend/providers/auth_provider.dart';
+import 'package:frontend/screens/about_chat_ai.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +31,7 @@ class App extends StatelessWidget {
         '/mypage': (context) => const MyPageScreen(),
         '/login': (context) => const LoginScreen(),
         '/history': (context) => const HistoryScreen(),
+        '/about-chat-ai': (context) => const AboutChatAIScreen(),
       },
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

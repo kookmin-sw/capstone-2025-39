@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/about_chat_ai.dart';
 import '../widgets/bottom_nav.dart';
 import 'package:frontend/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:frontend/screens/about_chat_ai.dart';
 
 class MyPageScreen extends StatefulWidget {
   const MyPageScreen({super.key});
@@ -166,6 +168,7 @@ class _MyPageScreenState extends State<MyPageScreen> {
               onTap: () {},
             ),
             ListTile(
+              // ChatAI 소개 화면으로 이동
               title: const Text(
                 'About ChatAI',
                 style: TextStyle(
@@ -174,7 +177,9 @@ class _MyPageScreenState extends State<MyPageScreen> {
                 ),
               ),
               trailing: const Icon(Icons.arrow_forward_ios, size: 18),
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, '/about-chat-ai');
+              },
             ),
             ListTile(
               title: const Text(
