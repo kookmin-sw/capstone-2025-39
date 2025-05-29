@@ -10,12 +10,52 @@
             font-family: sans-serif;
             line-height: 1.6;
             margin: 2em;
+            text-align: center;
         }
 
         h1,
         h2,
         h3 {
             color: #2c3e50;
+        }
+
+        .hero {
+            background-color: #90A891;
+            color: white;
+            height: 300px;
+            width: 100%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .hero-title {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 1em;
+        }
+
+        .hero-button {
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+        }
+
+        .hero-button a {
+            background-color: white;
+            color: #90A891;
+            text-decoration: none;
+            padding: 0.5em 1em;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .hero-button a:hover {
+            background-color: #e6e6e6;
         }
 
         table {
@@ -41,6 +81,7 @@
             padding: 1em;
             display: block;
             white-space: pre-wrap;
+            text-align: left;
         }
 
         .avatar img {
@@ -51,24 +92,32 @@
 
 <body>
 
+    <div class="hero">
+        <div class="hero-title">정릉친구</div>
+        <div class="hero-button">
+            <a href="https://github.com/kookmin-sw/capstone-2025-39" target="_blank">GitHub 바로가기</a>
+        </div>
+    </div>
+
     <h1>정릉친구</h1>
     <p><strong>내 손안의 지역 맞춤형 AI 도우미, 캡스톤디자인 39팀 정릉친구</strong></p>
 
-    <p>정릉친구는 RAG(Retrieval-Augmented Generation) 기술을 기반으로 제작된 지역 특화 AI 서비스입니다.
-        동네 음식점부터 소규모 문화 장소까지, 홍보가 어려운 소상공인들의 정보를 정확하고 세심하게 제공합니다.
+    <p>정릉친구는 RAG(Retrieval-Augmented Generation) 기술을 기반으로 제작된 지역 특화 AI 서비스입니다.<br>
+        동네 음식점부터 소규모 문화 장소까지, 홍보가 어려운 소상공인들의 정보를 정확하고 세심하게 제공합니다.<br>
         사용자의 질문에 실시간으로 답변하며, 기존 검색 플랫폼에서 누락되기 쉬운 동네의 숨은 명소를 발굴해 연결합니다.</p>
 
     <img src="./ex.png" alt="정릉친구 이미지" width="600">
 
     <h3>주요 기능</h3>
-    <ul>
+    <ul style="display: inline-block; text-align: left;">
         <li>맞춤형 추천: 위치·취향 기반 장소 추천</li>
         <li>실시간 정보 업데이트: 영업 시간, 메뉴, 이벤트 등 신뢰도 높은 데이터 반영</li>
         <li>소상공인 지원: 홍보가 어려운 가게를 AI가 직접 소개하여 지역 경제 활성화 기여</li>
     </ul>
 
-    <p>정릉친구는 단순 정보 제공을 넘어, 지역 상권의 생태계를 건강하게 유지하는 데 기여합니다. 방문객에게는 특색 있는 경험을,
-        소상공인에게는 새로운 고객 유입을 창출하며 지역 주민과 소비자가 함께 성장하는 선순환을 목표로 합니다.</p>
+    <p>정릉친구는 단순 정보 제공을 넘어, 지역 상권의 생태계를 건강하게 유지하는 데 기여합니다. <br>
+        방문객에게는 특색 있는 경험을, 소상공인에게는 새로운 고객 유입을 창출하며<br>
+        지역 주민과 소비자가 함께 성장하는 선순환을 목표로 합니다.</p>
 
     <blockquote>
         <p>"동네의 작은 이야기가 세상에 빛을 발하는 날까지."<br>
@@ -116,9 +165,8 @@
         </tbody>
     </table>
 
-    <h3>사용법</h3>
+    <h2>사용법</h2>
 
-    <h4>Common</h4>
     <pre><code class="language-bash">git clone https://github.com/kookmin-sw/capstone-2025-39.git</code></pre>
 
     <h4>Client</h4>
